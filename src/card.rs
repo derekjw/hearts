@@ -1,5 +1,3 @@
-
-
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Card {
     pub suit: Suit,
@@ -7,7 +5,9 @@ pub struct Card {
 }
  
 impl Card {
-
+	pub fn new(suit: Suit, rank: Rank) -> Card {
+		Card { suit: suit, rank: rank }
+	}
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

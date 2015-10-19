@@ -1,21 +1,21 @@
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Card {
-    suit: Suit,
-    rank: Rank
+    pub suit: Suit,
+    pub rank: Rank
 }
  
 impl Card {
 
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Suit {
-	Heart,
+	Club,
 	Diamond,
-	Spade,
-	Club
+	Heart,
+	Spade
 }
 
 impl Suit {
@@ -41,7 +41,7 @@ impl Into<u32> for Suit {
 	}
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Rank {
 	Ace,
 	Two,

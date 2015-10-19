@@ -3,7 +3,7 @@ pub struct Card {
     pub suit: Suit,
     pub rank: Rank
 }
- 
+
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Card {
         Card { suit: suit, rank: rank }

@@ -6,7 +6,7 @@ use std::collections::btree_map::BTreeMap;
 
 #[allow(dead_code)]
 fn main() {
-    let team_name = "FlyingBirds";
+    let team_name = PlayerName::new("FlyingBirds");
     let password = "mypassword";
 
     println!("Start Game");
@@ -14,6 +14,17 @@ fn main() {
     // Settings.init();
     let player = Player::new(team_name, password, "localhost");
     player.play();
+}
+
+#[derive(Debug)]
+struct PlayerName {
+    value: String
+}
+
+impl PlayerName {
+    pub fn new(value: &str) -> PlayerName {
+        PlayerName { value: value.to_owned() }
+    }
 }
 
 struct Settings {
@@ -24,7 +35,7 @@ struct Settings {
 
 #[derive(Debug)]
 struct Player {
-    team_name: String,
+    team_name: PlayerName,
     password: String,
     base_url: String,
     card_strategy: String,
@@ -32,10 +43,10 @@ struct Player {
 }
 
 impl Player {
-    pub fn new(team_name: &str, password: &str, hostname: &str) -> Player {
+    pub fn new(team_name: PlayerName, password: &str, hostname: &str) -> Player {
         let base_url = format!("http://{}/api/participant", hostname);
         Player {
-            team_name: team_name.to_owned(),
+            team_name: team_name,
             password: password.to_owned(),
             base_url: base_url,
             card_strategy: "card_strategy".to_owned(),
@@ -56,8 +67,8 @@ struct GameStatus {
     current_round_state: RoundState,
     round_parameters: RoundParameters,
     my_game_state: HeartsGameInstanceState,
-    my_game_players: Vec<String>,
-    my_left_player: String,
+    my_game_players: Vec<PlayerName>,
+    my_left_player: PlayerName,
     my_initial_hand: Vec<Card>,
     my_final_hand: Vec<Card>,
     my_current_hand: Vec<Card>,
@@ -93,6 +104,24 @@ struct RoundParameters {
     card_points: BTreeMap<Card, i32>
 }
 
-struct HeartsGameInstanceState;
+enum HeartsGameInstanceState {
+    NotStarted,
+    Initiated,
+    Passing,
+    Dealing,
+    Finished,
+    Cancelled,
+}
 
-struct Deal;
+struct Deal {
+    deal_number: u32,
+    initiator: String,
+    suit_type: Suit,
+    deal_cards: Vec<DealCard>,
+    deal_winner: PlayerName,
+}
+
+struct DealCard {
+    team_name: PlayerName,
+    card: Card,
+}

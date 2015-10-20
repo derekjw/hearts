@@ -115,7 +115,7 @@ enum HeartsGameInstanceState {
 
 struct Deal {
     deal_number: u32,
-    initiator: String,
+    initiator: PlayerName,
     suit_type: Suit,
     deal_cards: Vec<DealCard>,
     deal_winner: PlayerName,

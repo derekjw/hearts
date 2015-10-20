@@ -3,3 +3,7 @@
 name = "hearts"
 version = "0.0.1"
 authors = [ "Derek Williams <derek.williams1@rbs.com>" ]
+
+[dependencies]
+
+hyper = "0.6.15"

@@ -2,7 +2,8 @@
 pub mod card;
 
 use card::*;
-use std::collections::btree_map::BTreeMap;
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 #[allow(dead_code)]
 fn main() {
@@ -67,11 +68,11 @@ struct GameStatus {
     current_round_state: RoundState,
     round_parameters: RoundParameters,
     my_game_state: HeartsGameInstanceState,
-    my_game_players: Vec<PlayerName>,
+    my_game_players: BTreeSet<PlayerName>,
     my_left_player: PlayerName,
-    my_initial_hand: Vec<Card>,
-    my_final_hand: Vec<Card>,
-    my_current_hand: Vec<Card>,
+    my_initial_hand: BTreeSet<Card>,
+    my_final_hand: BTreeSet<Card>,
+    my_current_hand: BTreeSet<Card>,
     my_game_deals: Vec<Deal>,
     my_in_progress_deal: Deal,
     is_my_turn: bool,
@@ -117,7 +118,7 @@ struct Deal {
     deal_number: u32,
     initiator: PlayerName,
     suit_type: Suit,
-    deal_cards: Vec<DealCard>,
+    deal_cards: BTreeSet<DealCard>,
     deal_winner: PlayerName,
 }
 

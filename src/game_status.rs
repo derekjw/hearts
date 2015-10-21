@@ -45,7 +45,7 @@ struct RoundParameters {
     passing_phase_in_seconds: u32,
     dealing_phase_in_seconds: u32,
     finishing_phase_in_seconds: u32,
-    numberOfCardsToBePassed: u32,
+    number_of_cards_to_be_passed: u32,
     card_points: BTreeMap<Card, i32>
 }
 

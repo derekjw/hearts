@@ -1,3 +1,5 @@
+mod dto;
+
 use card::Card;
 use deal::Deal;
 use player::PlayerName;
@@ -56,4 +58,27 @@ pub enum HeartsGameInstanceState {
     Dealing,
     Finished,
     Cancelled,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::dto::*;
+
+    extern crate env_logger;
+    extern crate serde;
+    extern crate serde_json;
+
+    use std::fs::File;
+    use std::io::Read;
+
+    #[test]
+    fn read_json() {
+        env_logger::init().unwrap();
+        let mut game_status_file = File::open("gamestatus.json").unwrap();
+        let mut game_status_string = String::new();
+        game_status_file.read_to_string(&mut game_status_string).unwrap();
+        let game_status: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
+    }
+
 }

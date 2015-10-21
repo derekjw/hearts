@@ -8,7 +8,7 @@ use std::thread;
 use hyper::Client;
 use hyper::header::Connection;
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 pub struct PlayerName (String);
 
 impl PlayerName {

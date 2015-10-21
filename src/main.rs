@@ -1,10 +1,16 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+#![feature(custom_attribute)]
+#![feature(custom_derive, plugin)]
+#![plugin(serde_macros)]
+
 extern crate hyper;
 #[macro_use]
 extern crate log;
 extern crate env_logger;
+extern crate serde;
+extern crate serde_json;
 
 mod card;
 mod player;

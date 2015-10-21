@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank
@@ -10,7 +10,7 @@ impl Card {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
     Club,
     Diamond,
@@ -41,7 +41,7 @@ impl Into<u32> for Suit {
     }
 }
 
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Rank {
     Two,
     Three,

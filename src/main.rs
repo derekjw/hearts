@@ -1,7 +1,9 @@
 
 pub mod card;
 
-use card::*;
+use card::Card;
+use card::Suit;
+
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
@@ -23,8 +25,9 @@ struct PlayerName {
 }
 
 impl PlayerName {
-    pub fn new(value: &str) -> PlayerName {
-        PlayerName { value: value.to_owned() }
+    pub fn new<A>(value: A) -> PlayerName
+    where A: Into<String> {
+        PlayerName { value: value.into() }
     }
 }
 
@@ -44,11 +47,12 @@ struct Player {
 }
 
 impl Player {
-    pub fn new(team_name: PlayerName, password: &str, hostname: &str) -> Player {
+    pub fn new<A>(team_name: PlayerName, password: A, hostname: &str) -> Player
+    where A: Into<String> {
         let base_url = format!("http://{}/api/participant", hostname);
         Player {
             team_name: team_name,
-            password: password.to_owned(),
+            password: password.into(),
             base_url: base_url,
             card_strategy: "card_strategy".to_owned(),
             player_activity_tracker: "player_activity_tracker".to_owned(),

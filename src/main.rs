@@ -6,13 +6,12 @@ mod deal;
 
 use player::Player;
 use player::PlayerName;
-
-use std::collections::BTreeMap;
+use player::Password;
 
 #[allow(dead_code)]
 fn main() {
     let player_name = PlayerName::new("FlyingBirds");
-    let password = "mypassword";
+    let password = Password::new("mypassword");
 
     println!("Start Game");
 

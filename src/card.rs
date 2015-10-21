@@ -43,7 +43,6 @@ impl Into<u32> for Suit {
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Rank {
-    Ace,
     Two,
     Three,
     Four,
@@ -55,13 +54,13 @@ pub enum Rank {
     Ten,
     Jack,
     Queen,
-    King
+    King,
+    Ace,
 }
 
 impl Rank {
     pub fn from_number(num: &u32) -> Option<Rank> {
         match *num {
-            1 => Some(Rank::Ace),
             2 => Some(Rank::Two),
             3 => Some(Rank::Three),
             4 => Some(Rank::Four),
@@ -74,6 +73,7 @@ impl Rank {
             11 => Some(Rank::Jack),
             12 => Some(Rank::Queen),
             13 => Some(Rank::King),
+            14 => Some(Rank::Ace),
             _ => None
         }
     }
@@ -82,7 +82,6 @@ impl Rank {
 impl Into<u32> for Rank {
     fn into(self) -> u32 {
         match self {
-            Rank::Ace => 1,
             Rank::Two => 2,
             Rank::Three => 3,
             Rank::Four => 4,
@@ -94,7 +93,8 @@ impl Into<u32> for Rank {
             Rank::Ten => 10,
             Rank::Jack => 11,
             Rank::Queen => 12,
-            Rank::King => 13
+            Rank::King => 13,
+            Rank::Ace => 14,
         }
     }
 }
@@ -112,4 +112,10 @@ mod tests {
     fn reversible_rank() {
         assert_eq!(Some(Rank::Ace), Rank::from_number(&Rank::Ace.into()));
     }
+
+    #[test]
+    fn invalid_rank() {
+        assert_eq!(None, Rank::from_number(&1));
+    }
+
 }

@@ -4,10 +4,12 @@ mod card;
 mod player;
 mod game_status;
 mod deal;
+mod card_strategy;
 
 use player::Player;
 use player::PlayerName;
 use player::Password;
+use card_strategy::SimpleCardStrategy;
 
 #[allow(dead_code)]
 fn main() {
@@ -17,7 +19,7 @@ fn main() {
     println!("Start Game");
 
     // Settings.init();
-    let player = Player::new(player_name, password, "localhost");
+    let player = Player::new(player_name, password, "localhost", SimpleCardStrategy);
     player.play();
 }
 

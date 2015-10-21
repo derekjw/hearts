@@ -7,7 +7,4 @@ authors = [ "Derek Williams <derek.williams1@rbs.com>" ]
 hyper = "0.6.15"
 serde = "0.6.1"
 serde_json = "0.6.0"
-
-[build-dependencies]
-serde_codegen = "0.6.1"
-syntex = "0.17.0"
+serde_macros = "0.6.1"

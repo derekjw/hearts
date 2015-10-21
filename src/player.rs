@@ -1,7 +1,6 @@
 use card_strategy::CardStrategy;
 
 use std::collections::BTreeMap;
-use std::fmt::Debug;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
 pub struct PlayerName (String);
@@ -24,7 +23,7 @@ impl Password {
 }
 
 #[derive(Debug)]
-pub struct Player<A: CardStrategy + Debug> {
+pub struct Player<A: CardStrategy> {
     player_name: PlayerName,
     password: Password,
     base_url: String,
@@ -32,7 +31,7 @@ pub struct Player<A: CardStrategy + Debug> {
     player_activity_tracker: BTreeMap<PlayerName, bool>,
 }
 
-impl<A: CardStrategy + Debug> Player<A> {
+impl<A: CardStrategy> Player<A> {
     pub fn new(player_name: PlayerName, password: Password, hostname: &str, card_strategy: A) -> Player<A> {
         let base_url = format!("http://{}/api/participant", hostname);
         Player {

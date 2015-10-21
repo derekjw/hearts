@@ -6,23 +6,23 @@ use std::collections::BTreeSet;
 use std::collections::BTreeMap;
 
 pub struct GameStatus {
-    current_game_id: String,
-    current_game_state: GameInstanceState,
-    current_round_id: u32,
-    current_round_state: RoundState,
-    round_parameters: RoundParameters,
-    my_game_state: HeartsGameInstanceState,
-    my_game_players: BTreeSet<PlayerName>,
-    my_left_player: PlayerName,
-    my_initial_hand: BTreeSet<Card>,
-    my_final_hand: BTreeSet<Card>,
-    my_current_hand: BTreeSet<Card>,
-    my_game_deals: Vec<Deal>,
-    my_in_progress_deal: Deal,
-    is_my_turn: bool,
+    pub current_game_id: String,
+    pub current_game_state: GameInstanceState,
+    pub current_round_id: u32,
+    pub current_round_state: RoundState,
+    pub round_parameters: RoundParameters,
+    pub my_game_state: HeartsGameInstanceState,
+    pub my_game_players: BTreeSet<PlayerName>,
+    pub my_left_player: PlayerName,
+    pub my_initial_hand: BTreeSet<Card>,
+    pub my_final_hand: BTreeSet<Card>,
+    pub my_current_hand: BTreeSet<Card>,
+    pub my_game_deals: Vec<Deal>,
+    pub my_in_progress_deal: Deal,
+    pub is_my_turn: bool,
 }
 
-enum GameInstanceState {
+pub enum GameInstanceState {
     NotStarted,
     Initiated,
     Open,
@@ -31,7 +31,7 @@ enum GameInstanceState {
     Cancelled,
 }
 
-enum RoundState {
+pub enum RoundState {
     NotStarted,
     Initiated,
     Running,
@@ -39,7 +39,7 @@ enum RoundState {
     Cancelled,
 }
 
-struct RoundParameters {
+pub struct RoundParameters {
     round_id: u32,
     initiation_phase_in_seconds: u32,
     passing_phase_in_seconds: u32,
@@ -49,7 +49,7 @@ struct RoundParameters {
     card_points: BTreeMap<Card, i32>
 }
 
-enum HeartsGameInstanceState {
+pub enum HeartsGameInstanceState {
     NotStarted,
     Initiated,
     Passing,

@@ -4,9 +4,11 @@ use card::Card;
 use game_status::GameStatus;
 use player::PlayerName;
 
+use std::fmt::Debug;
+
 pub use card_strategy::simple_card_strategy::SimpleCardStrategy;
 
-pub trait CardStrategy {
-    fn pass_cards(&mut self, game_status: &GameStatus) -> Vec<Card>;
-    fn play_card(game_status: &GameStatus, player_name: &PlayerName) -> Card;
+pub trait CardStrategy: Debug {
+    fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card>;
+    fn play_card<'a>(game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card;
 }

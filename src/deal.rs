@@ -5,14 +5,14 @@ use card::Suit;
 use std::collections::BTreeSet;
 
 pub struct Deal {
-    deal_number: u32,
-    initiator: PlayerName,
-    suit_type: Suit,
-    deal_cards: BTreeSet<DealCard>,
-    deal_winner: PlayerName,
+    pub deal_number: u32,
+    pub initiator: PlayerName,
+    pub suit: Suit,
+    pub deal_cards: BTreeSet<DealCard>,
+    pub deal_winner: PlayerName,
 }
 
-struct DealCard {
-    player_name: PlayerName,
-    card: Card,
+pub struct DealCard {
+    pub player_name: PlayerName,
+    pub card: Card,
 }

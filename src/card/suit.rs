@@ -8,9 +8,9 @@ pub enum Suit {
     Spade
 }
 
-impl Into<u32> for Suit {
-    fn into(self) -> u32 {
-        match self {
+impl From<Suit> for u32 {
+    fn from(suit: Suit) -> u32 {
+        match suit {
             Suit::Heart => 1,
             Suit::Diamond => 2,
             Suit::Spade => 3,

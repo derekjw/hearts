@@ -12,10 +12,10 @@ pub struct CardDto {
     symbol: String,
 }
 
-impl Into<Card> for CardDto {
-    fn into(self) -> Card {
-        let suit = OptionSuit::from(&self.suit as &str).expect("Not a valid suit");
-        let rank = OptionRank::from(self.number).expect("Not a valid number");
+impl From<CardDto> for Card {
+    fn from(dto: CardDto) -> Card {
+        let suit = OptionSuit::from(&dto.suit as &str).expect("Not a valid suit");
+        let rank = OptionRank::from(dto.number).expect("Not a valid number");
         Card::new(suit, rank)
     }
 }

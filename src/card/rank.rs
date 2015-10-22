@@ -17,9 +17,9 @@ pub enum Rank {
     Ace,
 }
 
-impl Into<u32> for Rank {
-    fn into(self) -> u32 {
-        match self {
+impl From<Rank> for u32 {
+    fn from(rank: Rank) -> u32 {
+        match rank {
             Rank::Two => 2,
             Rank::Three => 3,
             Rank::Four => 4,

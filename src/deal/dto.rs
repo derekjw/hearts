@@ -25,7 +25,7 @@ impl From<DealDto> for Deal {
             deal_number: dto.deal_number,
             initiator: dto.initiator,
             suit: OptionSuit::from(&dto.suit_type as &str).expect("Invalid suit"),
-            deal_cards: dto.deal_cards.into_iter().map(|deal_card_dto| DealCard::from(deal_card_dto)).collect(),
+            deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: Some(dto.deal_winner),
         }
     }
@@ -49,7 +49,7 @@ impl From<InProgressDealDto> for Deal {
             deal_number: dto.deal_number,
             initiator: dto.initiator,
             suit: OptionSuit::from(&dto.suit_type as &str).expect("Invalid suit"),
-            deal_cards: dto.deal_cards.into_iter().map(|deal_card_dto| DealCard::from(deal_card_dto)).collect(),
+            deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: None,
         }
     }

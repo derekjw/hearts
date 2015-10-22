@@ -1,3 +1,5 @@
+use card::dto::CardDto;
+
 #[derive(Deserialize, Debug)]
 pub struct GameStatusDto {
     #[serde(rename="CurrentGameId")]
@@ -61,16 +63,6 @@ pub struct CardPointsDto {
 }
 
 #[derive(Deserialize, Debug)]
-pub struct CardDto {
-    #[serde(rename="Suit")]
-    suit: String,
-    #[serde(rename="Number")]
-    number: u32,
-    #[serde(rename="Symbol")]
-    symbol: String,
-}
-
-#[derive(Deserialize, Debug)]
 pub struct GameParticipantDto {
     #[serde(rename="TeamName")]
     team_name: String,
@@ -117,4 +109,14 @@ pub struct DealCardDto {
     team_name: String,
     #[serde(rename="Card")]
     card: CardDto,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn hello() {
+    }
+
 }

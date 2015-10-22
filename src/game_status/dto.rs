@@ -13,8 +13,6 @@ use deal::dto::InProgressDealDto;
 use player::PlayerName;
 
 use std::collections::BTreeMap;
-use std::collections::BTreeSet;
-use std::iter::FromIterator;
 
 #[derive(Deserialize, Debug)]
 pub struct GameStatusDto {
@@ -61,10 +59,10 @@ impl From<GameStatusDto> for GameStatus {
             current_round_state: RoundState::from(&dto.current_round_state as &str),
             round_parameters: RoundParameters::from(dto.round_parameters),
             my_game_state: HeartsGameInstanceState::from(&dto.my_game_state as &str),
-            my_game_players: BTreeSet::from_iter(dto.my_game_participants.into_iter().map(|participant| participant.team_name)),
-            my_initial_hand: BTreeSet::from_iter(dto.my_initial_hand.into_iter().map(|card_dto| Card::from(card_dto))),
-            my_final_hand: BTreeSet::from_iter(dto.my_final_hand.into_iter().map(|card_dto| Card::from(card_dto))),
-            my_current_hand: BTreeSet::from_iter(dto.my_current_hand.into_iter().map(|card_dto| Card::from(card_dto))),
+            my_game_players: dto.my_game_participants.into_iter().map(|participant| participant.team_name).collect(),
+            my_initial_hand: dto.my_initial_hand.into_iter().map(|card_dto| Card::from(card_dto)).collect(),
+            my_final_hand: dto.my_final_hand.into_iter().map(|card_dto| Card::from(card_dto)).collect(),
+            my_current_hand: dto.my_current_hand.into_iter().map(|card_dto| Card::from(card_dto)).collect(),
             my_game_deals: dto.my_game_deals.into_iter().map(|deal_dto| Deal::from(deal_dto)).collect(),
             my_in_progress_deal: Deal::from(dto.my_in_progress_deal),
             is_my_turn: dto.is_my_turn,

@@ -1,12 +1,12 @@
 use card_strategy::CardStrategy;
 
-use std::io::Read;
+// use std::io::Read;
 use std::collections::BTreeMap;
 use std::time::Duration;
 use std::thread;
 
 use hyper::Client;
-use hyper::header::Connection;
+// use hyper::header::Connection;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord)]
 pub struct PlayerName (String);

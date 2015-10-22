@@ -1,6 +1,4 @@
 use card::Card;
-use card::Rank;
-use card::Suit;
 use card::OptionSuit;
 use card::OptionRank;
 

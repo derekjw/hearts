@@ -62,7 +62,7 @@ pub enum HeartsGameInstanceState {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    // use super::*;
     use super::dto::*;
 
     extern crate env_logger;

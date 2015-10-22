@@ -25,14 +25,12 @@ mod tests {
 
     #[test]
     fn reversible_suit() {
-        let num: u32 = Suit::Heart.into();
-        assert_eq!(Some(Suit::Heart), *OptionSuit::from(num));
+        assert_eq!(Some(Suit::Heart), *OptionSuit::from(u32::from(Suit::Heart)));
     }
 
     #[test]
     fn reversible_rank() {
-        let num: u32 = Rank::Ace.into();
-        assert_eq!(Some(Rank::Ace), *OptionRank::from(num));
+        assert_eq!(Some(Rank::Ace), *OptionRank::from(u32::from(Rank::Ace)));
     }
 
     #[test]

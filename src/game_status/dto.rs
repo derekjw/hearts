@@ -62,7 +62,6 @@ impl From<GameStatusDto> for GameStatus {
             round_parameters: RoundParameters::from(dto.round_parameters),
             my_game_state: HeartsGameInstanceState::from(&dto.my_game_state as &str),
             my_game_players: BTreeSet::from_iter(dto.my_game_participants.into_iter().map(|participant| participant.team_name)),
-            my_left_player: PlayerName::new("hello"),
             my_initial_hand: BTreeSet::from_iter(dto.my_initial_hand.into_iter().map(|card_dto| Card::from(card_dto))),
             my_final_hand: BTreeSet::from_iter(dto.my_final_hand.into_iter().map(|card_dto| Card::from(card_dto))),
             my_current_hand: BTreeSet::from_iter(dto.my_current_hand.into_iter().map(|card_dto| Card::from(card_dto))),

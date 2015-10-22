@@ -16,7 +16,6 @@ pub struct GameStatus {
     pub round_parameters: RoundParameters,
     pub my_game_state: HeartsGameInstanceState,
     pub my_game_players: BTreeSet<PlayerName>,
-    pub my_left_player: PlayerName,
     pub my_initial_hand: BTreeSet<Card>,
     pub my_final_hand: BTreeSet<Card>,
     pub my_current_hand: BTreeSet<Card>,

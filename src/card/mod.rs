@@ -7,7 +7,7 @@ pub use card::suit::OptionSuit;
 pub use card::rank::Rank;
 pub use card::rank::OptionRank;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Card {
     pub suit: Suit,
     pub rank: Rank

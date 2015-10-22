@@ -1,6 +1,6 @@
 use std::ops::Deref;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
     Club,
     Diamond,

@@ -12,8 +12,6 @@ use deal::dto::InProgressDealDto;
 
 use player::PlayerName;
 
-use std::collections::BTreeMap;
-
 #[derive(Deserialize, Debug)]
 pub struct GameStatusDto {
     #[serde(rename="CurrentGameId")]
@@ -90,11 +88,6 @@ pub struct RoundParametersDto {
 
 impl From<RoundParametersDto> for RoundParameters {
     fn from(dto: RoundParametersDto) -> RoundParameters {
-        let mut card_points: BTreeMap<Card, i32> = BTreeMap::new();
-        for card_points_dto in dto.card_points {
-            card_points.insert(Card::from(card_points_dto.card), card_points_dto.points);
-        }
-
         RoundParameters {
             round_id: dto.round_id,
             initiation_phase_in_seconds: dto.initiation_phase_in_seconds,
@@ -102,7 +95,7 @@ impl From<RoundParametersDto> for RoundParameters {
             dealing_phase_in_seconds: dto.dealing_phase_in_seconds,
             finishing_phase_in_seconds: dto.finishing_phase_in_seconds,
             number_of_cards_to_be_passed: dto.number_of_cards_to_be_passed,
-            card_points: card_points,
+            card_points: dto.card_points.into_iter().map(CardPointsDto::into).collect(),
         }
     }
 }
@@ -113,6 +106,12 @@ pub struct CardPointsDto {
     card: CardDto,
     #[serde(rename="Point")]
     points: i32,
+}
+
+impl From<CardPointsDto> for (Card, i32) {
+    fn from(dto: CardPointsDto) -> (Card, i32) {
+        (Card::from(dto.card), dto.points)
+    }
 }
 
 #[derive(Deserialize, Debug)]

@@ -1,4 +1,4 @@
-mod dto;
+pub mod dto;
 
 use card::Card;
 use deal::Deal;
@@ -72,13 +72,13 @@ impl<'a> From<&'a str> for RoundState {
 
 #[derive(Debug)]
 pub struct RoundParameters {
-    round_id: u32,
-    initiation_phase_in_seconds: u32,
-    passing_phase_in_seconds: u32,
-    dealing_phase_in_seconds: u32,
-    finishing_phase_in_seconds: u32,
-    number_of_cards_to_be_passed: u32,
-    card_points: BTreeMap<Card, i32>
+    pub round_id: u32,
+    pub initiation_phase_in_seconds: u32,
+    pub passing_phase_in_seconds: u32,
+    pub dealing_phase_in_seconds: u32,
+    pub finishing_phase_in_seconds: u32,
+    pub number_of_cards_to_be_passed: u32,
+    pub card_points: BTreeMap<Card, i32>
 }
 
 #[derive(Debug)]

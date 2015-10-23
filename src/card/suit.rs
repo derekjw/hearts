@@ -19,6 +19,24 @@ impl From<Suit> for u32 {
     }
 }
 
+impl From<Suit> for &'static str {
+    fn from(suit: Suit) -> &'static str {
+        match suit {
+            Suit::Heart => "Heart",
+            Suit::Diamond => "Diamond",
+            Suit::Spade => "Spade",
+            Suit::Club => "Club"
+        }
+    }
+}
+
+impl From<Suit> for String {
+    fn from(suit: Suit) -> String {
+        let suit_str: &str = suit.into();
+        suit_str.to_owned()
+    }
+}
+
 pub struct OptionSuit {
     value: Option<Suit>
 }

@@ -22,28 +22,28 @@ pub struct GameStatusDto {
     current_round_id: u32,
     #[serde(rename="CurrentRoundState")]
     current_round_state: String,
-    #[serde(rename="RoundParameters")]
+    #[serde(rename="RoundParameters", default)]
     round_parameters: RoundParametersDto,
     #[serde(rename="MyGameState")]
     my_game_state: String,
     #[serde(rename="MyGameStateDescription")]
     my_game_state_description: String,
-    #[serde(rename="MyGameParticipants")]
+    #[serde(rename="MyGameParticipants", default)]
     my_game_participants: Vec<GameParticipantDto>,
-    #[serde(rename="MyInitialHand")]
+    #[serde(rename="MyInitialHand", default)]
     my_initial_hand: Vec<CardDto>,
-    #[serde(rename="CardsPassedByMe")]
+    #[serde(rename="CardsPassedByMe", default)]
     cards_passed_by_me: Vec<CardDto>,
-    #[serde(rename="CardsPassedToMe")]
+    #[serde(rename="CardsPassedToMe", default)]
     cards_passed_to_me: Vec<CardDto>,
-    #[serde(rename="MyFinalHand")]
+    #[serde(rename="MyFinalHand", default)]
     my_final_hand: Vec<CardDto>,
-    #[serde(rename="MyCurrentHand")]
+    #[serde(rename="MyCurrentHand", default)]
     my_current_hand: Vec<CardDto>,
-    #[serde(rename="MyGameDeals")]
+    #[serde(rename="MyGameDeals", default)]
     my_game_deals: Vec<DealDto>,
-    #[serde(rename="MyInProgressDeal")]
-    my_in_progress_deal: InProgressDealDto,
+    #[serde(rename="MyInProgressDeal", default)]
+    my_in_progress_deal: Option<InProgressDealDto>,
     #[serde(rename="IsMyTurn")]
     is_my_turn: bool,
 }
@@ -62,13 +62,13 @@ impl From<GameStatusDto> for GameStatus {
             my_final_hand: dto.my_final_hand.into_iter().map(Card::from).collect(),
             my_current_hand: dto.my_current_hand.into_iter().map(Card::from).collect(),
             my_game_deals: dto.my_game_deals.into_iter().map(Deal::from).collect(),
-            my_in_progress_deal: Deal::from(dto.my_in_progress_deal),
+            my_in_progress_deal: dto.my_in_progress_deal.map(Deal::from),
             is_my_turn: dto.is_my_turn,
         }
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Default)]
 pub struct RoundParametersDto {
     #[serde(rename="RoundId")]
     round_id: u32,

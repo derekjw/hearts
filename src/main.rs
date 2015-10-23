@@ -33,7 +33,7 @@ fn main() {
     info!("Start Game");
 
     // Settings.init();
-    let player = Player::new(player_name, password, "localhost", SimpleCardStrategy);
+    let player = Player::new(player_name, password, "localhost:2015", SimpleCardStrategy);
     player.play();
 }
 

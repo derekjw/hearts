@@ -23,7 +23,7 @@ impl From<DealDto> for Deal {
     fn from(dto: DealDto) -> Deal {
         Deal {
             deal_number: dto.deal_number,
-            initiator: dto.initiator,
+            initiator: Some(dto.initiator),
             suit: OptionSuit::from(&dto.suit_type as &str).expect("Invalid suit"),
             deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: Some(dto.deal_winner),
@@ -35,11 +35,11 @@ impl From<DealDto> for Deal {
 pub struct InProgressDealDto {
     #[serde(rename="DealNumber")]
     deal_number: u32,
-    #[serde(rename="Initiator")]
-    initiator: PlayerName,
+    #[serde(rename="Initiator", Default)]
+    initiator: Option<PlayerName>,
     #[serde(rename="SuitType")]
     suit_type: String,
-    #[serde(rename="DealCards")]
+    #[serde(rename="DealCards", Default)]
     deal_cards: Vec<DealCardDto>,
 }
 

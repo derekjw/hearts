@@ -20,7 +20,7 @@ pub struct GameStatus {
     pub my_final_hand: BTreeSet<Card>,
     pub my_current_hand: BTreeSet<Card>,
     pub my_game_deals: Vec<Deal>,
-    pub my_in_progress_deal: Deal,
+    pub my_in_progress_deal: Option<Deal>,
     pub is_my_turn: bool,
 }
 
@@ -119,8 +119,16 @@ mod tests {
 
     #[test]
     fn read_json() {
-        env_logger::init().unwrap();
         let mut game_status_file = File::open("gamestatus.json").unwrap();
+        let mut game_status_string = String::new();
+        game_status_file.read_to_string(&mut game_status_string).unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
+        let game_status = GameStatus::from(game_status_dto);
+    }
+
+    #[test]
+    fn read_json2() {
+        let mut game_status_file = File::open("gamestatus2.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();

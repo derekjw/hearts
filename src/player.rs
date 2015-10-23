@@ -13,6 +13,7 @@ use std::thread;
 
 use hyper;
 use hyper::Client;
+use hyper::header;
 
 use serde_json;
 
@@ -24,6 +25,11 @@ impl PlayerName {
     where A: Into<String> {
         PlayerName(value.into())
     }
+
+    fn clone_string(&self) -> String {
+        let &PlayerName(ref string) = self;
+        string.clone()
+    }
 }
 
 #[derive(Debug, PartialEq, Eq)]
@@ -33,6 +39,11 @@ impl Password {
     pub fn new<A>(value: A) -> Password
     where A: Into<String> {
         Password(value.into())
+    }
+
+    fn clone_string(&self) -> String {
+        let &Password(ref string) = self;
+        string.clone()
     }
 }
 
@@ -130,7 +141,7 @@ impl<A: CardStrategy> Player<A> {
 
     fn on_dealing(&mut self, game_status: &GameStatus) {
         self.display_my_current_hand(game_status);
-        let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, game_status.my_in_progress_deal.deal_number);
+        let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, game_status.my_in_progress_deal.clone().unwrap().deal_number);
         if !self.player_activity_tracker.contains(&key_dealing) {
             self.do_dealing_activity(game_status);
             self.player_activity_tracker.insert(key_dealing);
@@ -192,19 +203,43 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn ping(&self) -> bool {
-        self.client.head(&self.base_url).send().is_ok()
+        self.client.head(&self.base_url).header(self.authorization()).send().is_ok()
     }
 
     fn get_game_status(&self) -> GameStatus {
-        let mut response = self.client.get(&format!("{}/gamestatus", &self.base_url)).send().unwrap();
-        assert_eq!(hyper::Ok, response.status);
-        let mut response_body = String::new();
-        response.read_to_string(&mut response_body).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&response_body).unwrap();
-        GameStatus::from(game_status_dto)
+        match self.client.get(&format!("{}/gamestatus", &self.base_url)).header(self.authorization()).send() {
+            Err(e) => panic!("OH NOES {:?}", e),
+            Ok(mut response) => {
+                assert_eq!(hyper::Ok, response.status);
+                let mut response_body = String::new();
+                response.read_to_string(&mut response_body).unwrap();
+                let game_response: GameResponse = serde_json::from_str(&response_body).unwrap();
+                // info!("{}", game_response.data);
+                let game_status_dto: GameStatusDto = serde_json::from_str(&game_response.data).unwrap();
+                GameStatus::from(game_status_dto)
+            }
+        }
     }
 
     fn join_game(&self) -> bool {
-        true
+        self.client.post(&format!("{}/join", &self.base_url)).header(self.authorization()).send().is_ok()
     }
+
+    fn authorization(&self) -> header::Authorization<header::Basic> {
+        header::Authorization(
+            header::Basic {
+                username: self.player_name.clone_string(),
+                password: Some(self.password.clone_string())
+            }
+        )
+    }
+}
+
+
+#[derive(Deserialize, Debug)]
+struct GameResponse {
+    fault: Option<String>,
+    #[serde(rename="hasError")]
+    has_error: bool,
+    data: String,
 }

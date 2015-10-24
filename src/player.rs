@@ -149,7 +149,11 @@ impl<A: CardStrategy> Player<A> {
 
     fn on_dealing(&mut self, game_status: &GameStatus) {
         self.display_my_current_hand(game_status);
-        let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, game_status.my_in_progress_deal.clone().unwrap().deal_number);
+        let deal_number = match game_status.my_in_progress_deal {
+            Some(ref deal) => deal.deal_number,
+            None => 0
+        };
+        let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
         if !self.player_activity_tracker.contains(&key_dealing) {
             self.do_dealing_activity(game_status);
             self.player_activity_tracker.insert(key_dealing);

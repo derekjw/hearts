@@ -47,6 +47,14 @@ impl Password {
     }
 }
 
+#[derive(Deserialize, Debug)]
+struct GameResponse {
+    fault: Option<String>,
+    #[serde(rename="hasError")]
+    has_error: bool,
+    data: String,
+}
+
 pub struct Player<A: CardStrategy> {
     player_name: PlayerName,
     password: Password,
@@ -172,7 +180,14 @@ impl<A: CardStrategy> Player<A> {
         let cards_to_pass = self.card_strategy.pass_cards(game_status);
 
         let serialized_cards_to_pass = serde_json::to_string(&cards_to_pass).unwrap();
-        match self.client.post(&format!("{}/passcards", self.base_url)).body(&serialized_cards_to_pass).send() {
+
+        let result = self.client
+            .post(&format!("{}/passcards", self.base_url))
+            .header(self.authorization())
+            .body(&serialized_cards_to_pass)
+            .send();
+
+        match result {
             Err(e) => error!("Problem while passing: {}", e),
             Ok(response) => {
                 info!("{} cards passed successfully. Cards are :", number_of_cards_to_be_passed);
@@ -187,7 +202,14 @@ impl<A: CardStrategy> Player<A> {
         let card_to_deal = self.card_strategy.play_card(game_status, &self.player_name);
 
         let serialized_card_to_deal = serde_json::to_string(&card_to_deal).unwrap();
-        match self.client.post(&format!("{}/playcard", self.base_url)).body(&serialized_card_to_deal).send() {
+
+        let result = self.client
+            .post(&format!("{}/playcard", self.base_url))
+            .header(self.authorization())
+            .body(&serialized_card_to_deal)
+            .send();
+
+        match result {
             Err(e) => error!("Problem while playing card: {}", e),
             Ok(response) => {
                 info!("Card {:?} {:?} played Successfully", card_to_deal.suit, card_to_deal.rank);
@@ -203,11 +225,20 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn ping(&self) -> bool {
-        self.client.head(&self.base_url).header(self.authorization()).send().is_ok()
+        self.client
+            .head(&self.base_url)
+            .header(self.authorization())
+            .send()
+            .is_ok()
     }
 
     fn get_game_status(&self) -> GameStatus {
-        match self.client.get(&format!("{}/gamestatus", &self.base_url)).header(self.authorization()).send() {
+        let result = self.client
+            .get(&format!("{}/gamestatus", &self.base_url))
+            .header(self.authorization())
+            .send();
+
+        match result {
             Err(e) => panic!("OH NOES {:?}", e),
             Ok(mut response) => {
                 assert_eq!(hyper::Ok, response.status);
@@ -222,7 +253,11 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn join_game(&self) -> bool {
-        self.client.post(&format!("{}/join", &self.base_url)).header(self.authorization()).send().is_ok()
+        self.client
+            .post(&format!("{}/join", &self.base_url))
+            .header(self.authorization())
+            .send()
+            .is_ok()
     }
 
     fn authorization(&self) -> header::Authorization<header::Basic> {
@@ -233,13 +268,4 @@ impl<A: CardStrategy> Player<A> {
             }
         )
     }
-}
-
-
-#[derive(Deserialize, Debug)]
-struct GameResponse {
-    fault: Option<String>,
-    #[serde(rename="hasError")]
-    has_error: bool,
-    data: String,
 }

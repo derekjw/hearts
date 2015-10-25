@@ -1,6 +1,7 @@
 use card::Card;
-use card::OptionSuit;
-use card::OptionRank;
+use card::Suit;
+use card::Rank;
+use std::str::FromStr;
 
 #[derive(Deserialize, Debug)]
 pub struct CardDto {
@@ -12,11 +13,18 @@ pub struct CardDto {
     symbol: String,
 }
 
+impl From<CardDto> for Result<Card, String> {
+    fn from(dto: CardDto) -> Result<Card, String> {
+        let suit = try!(Suit::from_str(&dto.suit));
+        let rank = try!(Rank::from_str(&dto.symbol));
+        Ok(Card::new(suit, rank))
+    }
+}
+
 impl From<CardDto> for Card {
     fn from(dto: CardDto) -> Card {
-        let suit = OptionSuit::from(&dto.suit as &str).expect("Not a valid suit");
-        let rank = OptionRank::from(dto.number).expect("Not a valid number");
-        Card::new(suit, rank)
+        let result: Result<Card, String> = dto.into();
+        result.unwrap()
     }
 }
 
@@ -30,8 +38,8 @@ mod tests {
     #[test]
     fn into_card() {
         let dto = CardDto { suit: "Heart".to_owned(), number: 3, symbol: "3".to_owned() };
-        let card: Card = dto.into();
-        assert_eq!(Card::new(Suit::Heart, Rank::Three), card);
+        let card: Result<Card, String> = dto.into();
+        assert_eq!(Ok(Card::new(Suit::Heart, Rank::Three)), card);
     }
 
 }

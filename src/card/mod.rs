@@ -3,9 +3,7 @@ mod suit;
 mod rank;
 
 pub use card::suit::Suit;
-pub use card::suit::OptionSuit;
 pub use card::rank::Rank;
-pub use card::rank::OptionRank;
 
 use serde;
 
@@ -56,19 +54,21 @@ impl<'a> serde::ser::MapVisitor for CardMapVisitor<'a> {
 mod tests {
     use super::*;
 
+    use std::str::FromStr;
+
     #[test]
     fn reversible_suit() {
-        assert_eq!(Some(Suit::Heart), *OptionSuit::from(u32::from(Suit::Heart)));
+        assert_eq!(Ok(Suit::Heart), Suit::from_str(Suit::Heart.into()));
     }
 
     #[test]
     fn reversible_rank() {
-        assert_eq!(Some(Rank::Ace), *OptionRank::from(u32::from(Rank::Ace)));
+        assert_eq!(Ok(Rank::Ace), Rank::from_str(Rank::Ace.into()));
     }
 
     #[test]
     fn invalid_rank() {
-        assert_eq!(None, *OptionRank::from(1));
+        assert_eq!(Err("Not a valid rank: 1".to_owned()), Rank::from_str("1"));
     }
 
 }

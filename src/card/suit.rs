@@ -1,4 +1,4 @@
-use std::ops::Deref;
+use std::str::FromStr;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
@@ -6,17 +6,6 @@ pub enum Suit {
     Diamond,
     Heart,
     Spade
-}
-
-impl From<Suit> for u32 {
-    fn from(suit: Suit) -> u32 {
-        match suit {
-            Suit::Heart => 1,
-            Suit::Diamond => 2,
-            Suit::Spade => 3,
-            Suit::Club => 4
-        }
-    }
 }
 
 impl From<Suit> for &'static str {
@@ -37,40 +26,16 @@ impl From<Suit> for String {
     }
 }
 
-pub struct OptionSuit {
-    value: Option<Suit>
-}
+impl FromStr for Suit {
+    type Err = String;
 
-impl From<u32> for OptionSuit {
-    fn from(number: u32) -> OptionSuit {
-        let result = match number {
-            1 => Some(Suit::Heart),
-            2 => Some(Suit::Diamond),
-            3 => Some(Suit::Spade),
-            4 => Some(Suit::Club),
-            _ => None
-        };
-        OptionSuit { value: result }
-    }
-}
-
-impl<'a> From<&'a str> for OptionSuit {
-    fn from(string: &'a str) -> OptionSuit {
-        let result = match string {
-            "Heart" => Some(Suit::Heart),
-            "Diamond" => Some(Suit::Diamond),
-            "Spade" => Some(Suit::Spade),
-            "Club" => Some(Suit::Club),
-            _ => None
-        };
-        OptionSuit { value: result }
-    }
-}
-
-impl Deref for OptionSuit {
-    type Target = Option<Suit>;
-
-    fn deref<'a>(&'a self) -> &'a Option<Suit> {
-        &self.value
+    fn from_str(string: &str) -> Result<Suit, String> {
+        match string {
+            "Heart" => Ok(Suit::Heart),
+            "Diamond" => Ok(Suit::Diamond),
+            "Spade" => Ok(Suit::Spade),
+            "Club" => Ok(Suit::Club),
+            other => Err(format!("Not a valid suit: {}", other))
+        }
     }
 }

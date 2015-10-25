@@ -1,9 +1,11 @@
 use player::PlayerName;
 use card::Card;
-use card::OptionSuit;
+use card::Suit;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::DealCard;
+
+use std::str::FromStr;
 
 #[derive(Deserialize, Debug)]
 pub struct DealDto {
@@ -24,7 +26,7 @@ impl From<DealDto> for Deal {
         Deal {
             deal_number: dto.deal_number,
             initiator: Some(dto.initiator),
-            suit: OptionSuit::from(&dto.suit_type as &str).expect("Invalid suit"),
+            suit: Suit::from_str(&dto.suit_type).unwrap(),
             deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: Some(dto.deal_winner),
         }
@@ -48,7 +50,7 @@ impl From<InProgressDealDto> for Deal {
         Deal {
             deal_number: dto.deal_number,
             initiator: dto.initiator,
-            suit: OptionSuit::from(&dto.suit_type as &str).expect("Invalid suit"),
+            suit: Suit::from_str(&dto.suit_type).unwrap(),
             deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: None,
         }

@@ -10,15 +10,10 @@ use std::collections::BTreeMap;
 pub struct MyCardStrategy;
 
 impl MyCardStrategy {
-    // Lowest penalty for me using highest penalty card.
-    // Lowest penalty for me using highest ranked card.
-    // Lowest potential penalty for me using highest ranked card.
-    // filter valid cards
-    // order by: penalty to me ascending, penalty descending, rank descending
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus, player_name: &PlayerName) -> (i32, i32, i32, i32) {
         let card_penalty_to_me = MyCardStrategy::card_penalty_to_me(card, game_status, player_name);
         let card_penalty = 0 - MyCardStrategy::card_penalty(card, game_status);
-        let trouble = MyCardStrategy::trouble_score(card, game_status);
+        let trouble = card_penalty_to_me * (u32::from(card.rank) as i32);
         let card_rank = 0 - (u32::from(card.rank) as i32);
         (card_penalty_to_me, card_penalty, trouble, card_rank)
     }
@@ -30,15 +25,6 @@ impl MyCardStrategy {
     fn card_penalty_to_me(card: &Card, game_status: &GameStatus, player_name: &PlayerName) -> i32 {
         if MyCardStrategy::will_win_deal(card, game_status) {
             MyCardStrategy::card_penalty(card, game_status)
-        } else {
-            0
-        }
-    }
-
-    fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
-        if MyCardStrategy::will_win_deal(card, game_status) {
-            let rank_number: u32 = card.rank.into();
-            rank_number as i32
         } else {
             0
         }

@@ -39,20 +39,13 @@ impl MyCardStrategy {
     }
 
     fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
-        match game_status.my_in_progress_deal {
-            Some(ref deal) =>
-                match deal.suit {
-                    Some(current_suit) =>
-                        deal.deal_cards.iter()
-                            .map(|deal_card| deal_card.card)
-                            .filter(|card| card.suit == current_suit)
-                            .max()
-                            .map(|winning_card| card.suit == current_suit && card.rank > winning_card.rank)
-                            .unwrap_or(true),
-                    None => true
-                },
-            None => true
-        }
+        game_status.my_in_progress_deal.as_ref().and_then(|deal|
+            deal.suit.and_then(|current_suit|
+                deal.deal_cards.iter()
+                    .map(|deal_card| deal_card.card)
+                    .filter(|card| card.suit == current_suit)
+                    .max()
+                    .map(|winning_card| card.suit == current_suit && card.rank > winning_card.rank))).unwrap_or(true)
     }
 }
 

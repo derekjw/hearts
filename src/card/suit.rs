@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
-    Club,
-    Diamond,
-    Heart,
     Spade,
+    Heart,
+    Diamond,
+    Club,
 }
 
 impl From<Suit> for &'static str {

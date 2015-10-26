@@ -20,7 +20,7 @@ impl MyCardStrategy {
 
     fn card_penalty(card: &Card, game_status: &GameStatus) -> i32 {
         game_status.round_parameters.card_points.get(card)
-            .map(|penalty| penalty.clone())
+            .map(|penalty| *penalty)
             .unwrap_or_default()
     }
 
@@ -68,11 +68,12 @@ impl CardStrategy for MyCardStrategy {
             valid_cards.extend(&game_status.my_current_hand);
         }
 
-        let scored_cards = valid_cards.into_iter()
+        valid_cards.into_iter()
             .map(|card| ((MyCardStrategy::score_card(card, game_status, player_name), card), card))
-            .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>();
-
-        scored_cards.values().next().expect("No valid cards to play!")
+            .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>()
+            .values()
+            .next()
+            .expect("No valid cards to play!")
     }
 
 }

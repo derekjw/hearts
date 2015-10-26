@@ -169,7 +169,7 @@ impl<A: CardStrategy> Player<A> {
 
         if !self.player_activity_tracker.contains(&key_display_current_hand) {
             let display_current_hand_cards = game_status.my_current_hand.iter()
-                .map(|card| format!("{}{}", card.suit, card.rank))
+                .map(|card| format!("{}", card))
                 .collect::<Vec<String>>()
                 .join(", ");
             info!("My Current Hand : {}", display_current_hand_cards);
@@ -201,7 +201,7 @@ impl<A: CardStrategy> Player<A> {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
                     let passed_cards = cards_to_pass.iter()
-                        .map(|card| format!("{}{}", card.suit, card.rank))
+                        .map(|card| format!("{}", card))
                         .collect::<Vec<String>>()
                         .join(", ");
 
@@ -230,7 +230,7 @@ impl<A: CardStrategy> Player<A> {
                 if game_response.has_error {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
-                    info!("{}{} played Successfully", card_to_deal.suit, card_to_deal.rank);
+                    info!("{} played Successfully", card_to_deal);
                 }
             }
         }

@@ -6,6 +6,7 @@ pub use card::suit::Suit;
 pub use card::rank::Rank;
 
 use serde;
+use std::fmt;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Card {
@@ -16,6 +17,12 @@ pub struct Card {
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Card {
         Card { suit: suit, rank: rank }
+    }
+}
+
+impl fmt::Display for Card {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}{}", self.suit, self.rank)
     }
 }
 

@@ -14,7 +14,7 @@ impl CardStrategy for SimpleCardStrategy {
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
-        let current_suit = game_status.my_in_progress_deal.as_ref().map(|deal| deal.suit);
+        let current_suit = game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit);
         let mut valid_cards: Vec<&'a Card> = game_status.my_current_hand.iter().filter(|card| Some(card.suit) == current_suit).collect();
 
         if valid_cards.is_empty() {

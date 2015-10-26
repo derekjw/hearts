@@ -45,30 +45,34 @@ impl MyCardStrategy {
     }
 
     fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
-        match game_status.my_in_progress_deal.as_ref().and_then(|deal| if deal.deal_cards.is_empty() { None } else { Some(deal) }) {
+        match game_status.my_in_progress_deal {
             Some(ref deal) => {
-                let current_suit = deal.suit;
-                let mut option_winning_card: Option<Card> = None;
+                match deal.suit {
+                    Some(current_suit) => {
+                        let mut option_winning_card: Option<Card> = None;
 
-                for deal_card in deal.deal_cards.iter() {
-                    if deal_card.card.suit == current_suit {
-                        match option_winning_card {
-                            None => option_winning_card = Some(deal_card.card.clone()),
-                            Some(winning_card) => {
-                                if deal_card.card.rank > winning_card.rank {
-                                    option_winning_card = Some(deal_card.card.clone())
+                        for deal_card in deal.deal_cards.iter() {
+                            if deal_card.card.suit == current_suit {
+                                match option_winning_card {
+                                    None => option_winning_card = Some(deal_card.card.clone()),
+                                    Some(winning_card) => {
+                                        if deal_card.card.rank > winning_card.rank {
+                                            option_winning_card = Some(deal_card.card.clone())
+                                        }
+                                    }
                                 }
                             }
                         }
+
+                        let will_win_rank = match option_winning_card {
+                            Some(winning_card) => card.rank > winning_card.rank,
+                            None => true
+                        };
+
+                        card.suit == current_suit && will_win_rank
                     }
-                }
-
-                let will_win_rank = match option_winning_card {
-                    Some(winning_card) => card.rank > winning_card.rank,
                     None => true
-                };
-
-                card.suit == current_suit && will_win_rank
+                }
             }
             None => true
         }
@@ -82,8 +86,7 @@ impl CardStrategy for MyCardStrategy {
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
-        info!("Current deal: {:?}", game_status.my_in_progress_deal);
-        let current_suit = game_status.my_in_progress_deal.as_ref().and_then(|deal| if deal.deal_cards.is_empty() { None } else { Some(deal) }).map(|deal| deal.suit);
+        let current_suit = game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit);
         let mut valid_cards: Vec<&'a Card> = game_status.my_current_hand.iter().filter(|card| Some(card.suit) == current_suit).collect();
 
         if valid_cards.is_empty() {

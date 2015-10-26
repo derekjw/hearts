@@ -6,6 +6,7 @@ use deal::Deal;
 use deal::DealCard;
 
 use std::str::FromStr;
+use std::collections::BTreeSet;
 
 #[derive(Deserialize, Debug)]
 pub struct DealDto {
@@ -26,7 +27,7 @@ impl From<DealDto> for Deal {
         Deal {
             deal_number: dto.deal_number,
             initiator: Some(dto.initiator),
-            suit: Suit::from_str(&dto.suit_type).unwrap(),
+            suit: Some(Suit::from_str(&dto.suit_type).unwrap()),
             deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
             deal_winner: Some(dto.deal_winner),
         }
@@ -49,11 +50,12 @@ pub struct InProgressDealDto {
 
 impl From<InProgressDealDto> for Deal {
     fn from(dto: InProgressDealDto) -> Deal {
+        let deal_cards: BTreeSet<DealCard> = dto.deal_cards.into_iter().map(DealCard::from).collect();
         Deal {
             deal_number: dto.deal_number,
             initiator: dto.initiator,
-            suit: Suit::from_str(&dto.suit_type).unwrap(),
-            deal_cards: dto.deal_cards.into_iter().map(DealCard::from).collect(),
+            suit: if deal_cards.is_empty() { None } else { Some(Suit::from_str(&dto.suit_type).unwrap()) },
+            deal_cards: deal_cards,
             deal_winner: None,
         }
     }

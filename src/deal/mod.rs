@@ -10,7 +10,7 @@ use std::collections::BTreeSet;
 pub struct Deal {
     pub deal_number: u32,
     pub initiator: Option<PlayerName>,
-    pub suit: Suit,
+    pub suit: Option<Suit>,
     pub deal_cards: BTreeSet<DealCard>,
     pub deal_winner: Option<PlayerName>,
 }

@@ -3,9 +3,9 @@ use std::str::FromStr;
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
     Club,
-    Spade,
-    Heart,
     Diamond,
+    Heart,
+    Spade,
 }
 
 impl From<Suit> for &'static str {

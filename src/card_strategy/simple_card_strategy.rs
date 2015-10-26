@@ -18,9 +18,13 @@ impl CardStrategy for SimpleCardStrategy {
         let mut valid_cards: Vec<&'a Card> = game_status.my_current_hand.iter().filter(|card| Some(card.suit) == current_suit).collect();
 
         if valid_cards.is_empty() {
-            let mut my_current_hand: Vec<&'a Card> = game_status.my_current_hand.iter().collect();
-            my_current_hand.reverse();
-            valid_cards.extend(&my_current_hand);
+            if current_suit.is_some() {
+                let mut my_current_hand: Vec<&'a Card> = game_status.my_current_hand.iter().collect();
+                my_current_hand.reverse();
+                valid_cards.extend(&my_current_hand);
+            } else {
+                valid_cards.extend(&game_status.my_current_hand);
+            }
         }
 
         valid_cards.first().expect("No valid cards to play!")

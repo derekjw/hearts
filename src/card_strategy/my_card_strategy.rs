@@ -68,7 +68,10 @@ impl MyCardStrategy {
 impl CardStrategy for MyCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
-        game_status.my_initial_hand.iter().take(3).collect()
+        // Need to order cards by potential to win lowest penalty hands
+        let mut initial_hand = game_status.my_initial_hand.clone();
+        initial_hand.reverse();
+        initial_hand.iter().take(3).collect()
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {

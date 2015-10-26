@@ -43,6 +43,8 @@ pub struct InProgressDealDto {
     suit_type: String,
     #[serde(rename="DealCards", Default)]
     deal_cards: Vec<DealCardDto>,
+    #[serde(rename="DealWinner", Default)]
+    deal_winner: Option<PlayerName>,
 }
 
 impl From<InProgressDealDto> for Deal {

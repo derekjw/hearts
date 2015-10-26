@@ -261,8 +261,10 @@ impl<A: CardStrategy> Player<A> {
                 if game_response.has_error {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
-                    let game_status_dto: GameStatusDto = serde_json::from_str(&game_response.data).unwrap();
-                    GameStatus::from(game_status_dto)
+                    match serde_json::from_str::<GameStatusDto>(&game_response.data) {
+                        Ok(game_status_dto) => GameStatus::from(game_status_dto),
+                        Err(e) => panic!("Failure to parse GameStatus: {:?}", e)
+                    }
                 }
             }
         }

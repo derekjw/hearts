@@ -19,7 +19,9 @@ impl MyCardStrategy {
     }
 
     fn card_penalty(card: &Card, game_status: &GameStatus) -> i32 {
-        game_status.round_parameters.card_points.get(card).map(|penalty| penalty.clone()).unwrap_or_default()
+        game_status.round_parameters.card_points.get(card)
+            .map(|penalty| penalty.clone())
+            .unwrap_or_default()
     }
 
     fn card_penalty_to_me(card: &Card, game_status: &GameStatus, player_name: &PlayerName) -> i32 {
@@ -67,7 +69,8 @@ impl CardStrategy for MyCardStrategy {
         }
 
         let scored_cards = valid_cards.into_iter()
-            .map(|card| ((MyCardStrategy::score_card(card, game_status, player_name), card), card)).collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>();
+            .map(|card| ((MyCardStrategy::score_card(card, game_status, player_name), card), card))
+            .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>();
 
         scored_cards.values().next().expect("No valid cards to play!")
     }

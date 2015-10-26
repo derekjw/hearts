@@ -32,8 +32,7 @@ impl MyCardStrategy {
 
     fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
         if MyCardStrategy::will_win_deal(card, game_status) {
-            let rank_number: u32 = card.rank.into();
-            rank_number as i32
+            u32::from(card.rank) as i32
         } else {
             0
         }
@@ -41,34 +40,17 @@ impl MyCardStrategy {
 
     fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
         match game_status.my_in_progress_deal {
-            Some(ref deal) => {
+            Some(ref deal) =>
                 match deal.suit {
-                    Some(current_suit) => {
-                        let mut option_winning_card: Option<Card> = None;
-
-                        for deal_card in deal.deal_cards.iter() {
-                            if deal_card.card.suit == current_suit {
-                                match option_winning_card {
-                                    None => option_winning_card = Some(deal_card.card.clone()),
-                                    Some(winning_card) => {
-                                        if deal_card.card.rank > winning_card.rank {
-                                            option_winning_card = Some(deal_card.card.clone())
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        let will_win_rank = match option_winning_card {
-                            Some(winning_card) => card.rank > winning_card.rank,
-                            None => true
-                        };
-
-                        card.suit == current_suit && will_win_rank
-                    }
+                    Some(current_suit) =>
+                        deal.deal_cards.iter()
+                            .map(|deal_card| deal_card.card)
+                            .filter(|card| card.suit == current_suit)
+                            .max()
+                            .map(|winning_card| card.suit == current_suit && card.rank > winning_card.rank)
+                            .unwrap_or(true),
                     None => true
-                }
-            }
+                },
             None => true
         }
     }

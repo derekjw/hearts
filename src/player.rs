@@ -170,7 +170,7 @@ impl<A: CardStrategy> Player<A> {
         if !self.player_activity_tracker.contains(&key_display_current_hand) {
             info!("My Current Hand : ");
             for card in &game_status.my_current_hand {
-                info!("{:?} {:?}", card.suit, card.rank);
+                info!("{}{}", card.suit, card.rank);
             }
             self.player_activity_tracker.insert(key_display_current_hand);
         }
@@ -201,7 +201,7 @@ impl<A: CardStrategy> Player<A> {
                 } else {
                     info!("{} cards passed successfully. Cards are :", number_of_cards_to_be_passed);
                     for card in &cards_to_pass {
-                        info!("{:?} {:?}", card.suit, card.rank);
+                        info!("{}{}", card.suit, card.rank);
                     }
                 }
             }
@@ -227,7 +227,7 @@ impl<A: CardStrategy> Player<A> {
                 if game_response.has_error {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
-                    info!("Card {:?} {:?} played Successfully", card_to_deal.suit, card_to_deal.rank);
+                    info!("Card {}{} played Successfully", card_to_deal.suit, card_to_deal.rank);
                 }
             }
         }

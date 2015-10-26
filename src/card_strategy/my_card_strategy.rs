@@ -40,12 +40,12 @@ impl MyCardStrategy {
 
     fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
         game_status.my_in_progress_deal.as_ref().and_then(|deal|
-            deal.suit.and_then(|current_suit|
+            deal.suit.and_then(|suit|
                 deal.deal_cards.iter()
                     .map(|deal_card| deal_card.card)
-                    .filter(|card| card.suit == current_suit)
+                    .filter(|card| card.suit == suit)
                     .max()
-                    .map(|winning_card| card.suit == current_suit && card.rank > winning_card.rank))).unwrap_or(true)
+                    .map(|winning_card| card.suit == suit && card.rank > winning_card.rank))).unwrap_or(true)
     }
 }
 
@@ -66,9 +66,8 @@ impl CardStrategy for MyCardStrategy {
             valid_cards.extend(&game_status.my_current_hand);
         }
 
-        let scored_cards: BTreeMap<((i32, i32, i32, i32), &Card), &Card> = valid_cards.into_iter().map(|card| {
-            ((MyCardStrategy::score_card(card, game_status, player_name), card), card)
-        }).collect();
+        let scored_cards = valid_cards.into_iter()
+            .map(|card| ((MyCardStrategy::score_card(card, game_status, player_name), card), card)).collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>();
 
         scored_cards.values().next().expect("No valid cards to play!")
     }

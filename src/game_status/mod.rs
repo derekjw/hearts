@@ -6,6 +6,7 @@ use player::PlayerName;
 
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
+use std::str::FromStr;
 
 #[derive(Debug)]
 pub struct GameStatus {
@@ -34,16 +35,18 @@ pub enum GameInstanceState {
     Cancelled,
 }
 
-impl<'a> From<&'a str> for GameInstanceState {
-    fn from(string: &'a str) -> GameInstanceState {
+impl FromStr for GameInstanceState {
+    type Err = String;
+
+    fn from_str(string: &str) -> Result<GameInstanceState, String> {
         match string {
-            "NotStarted" => GameInstanceState::NotStarted,
-            "Initiated" => GameInstanceState::Initiated,
-            "Open" => GameInstanceState::Open,
-            "Running" => GameInstanceState::Running,
-            "Finished" => GameInstanceState::Finished,
-            "Cancelled" => GameInstanceState::Cancelled,
-            _ => panic!("Invalid GameInstanceState: {}", string)
+            "NotStarted" => Ok(GameInstanceState::NotStarted),
+            "Initiated" => Ok(GameInstanceState::Initiated),
+            "Open" => Ok(GameInstanceState::Open),
+            "Running" => Ok(GameInstanceState::Running),
+            "Finished" => Ok(GameInstanceState::Finished),
+            "Cancelled" => Ok(GameInstanceState::Cancelled),
+            _ => Err(format!("Invalid GameInstanceState: {}", string))
         }
     }
 }
@@ -57,15 +60,17 @@ pub enum RoundState {
     Cancelled,
 }
 
-impl<'a> From<&'a str> for RoundState {
-    fn from(string: &'a str) -> RoundState {
+impl FromStr for RoundState {
+    type Err = String;
+
+    fn from_str(string: &str) -> Result<RoundState, String> {
         match string {
-            "NotStarted" => RoundState::NotStarted,
-            "Initiated" => RoundState::Initiated,
-            "Running" => RoundState::Running,
-            "Finished" => RoundState::Finished,
-            "Cancelled" => RoundState::Cancelled,
-            _ => panic!("Invalid RoundState: {}", string)
+            "NotStarted" => Ok(RoundState::NotStarted),
+            "Initiated" => Ok(RoundState::Initiated),
+            "Running" => Ok(RoundState::Running),
+            "Finished" => Ok(RoundState::Finished),
+            "Cancelled" => Ok(RoundState::Cancelled),
+            _ => Err(format!("Invalid RoundState: {}", string))
         }
     }
 }
@@ -91,16 +96,18 @@ pub enum HeartsGameInstanceState {
     Cancelled,
 }
 
-impl<'a> From<&'a str> for HeartsGameInstanceState {
-    fn from(string: &'a str) -> HeartsGameInstanceState {
+impl FromStr for HeartsGameInstanceState {
+    type Err = String;
+
+    fn from_str(string: &str) -> Result<HeartsGameInstanceState, String> {
         match string {
-            "NotStarted" => HeartsGameInstanceState::NotStarted,
-            "Initiated" => HeartsGameInstanceState::Initiated,
-            "Passing" => HeartsGameInstanceState::Passing,
-            "Dealing" => HeartsGameInstanceState::Dealing,
-            "Finished" => HeartsGameInstanceState::Finished,
-            "Cancelled" => HeartsGameInstanceState::Cancelled,
-            _ => panic!("Invalid HeartsGameInstanceState: {}", string)
+            "NotStarted" => Ok(HeartsGameInstanceState::NotStarted),
+            "Initiated" => Ok(HeartsGameInstanceState::Initiated),
+            "Passing" => Ok(HeartsGameInstanceState::Passing),
+            "Dealing" => Ok(HeartsGameInstanceState::Dealing),
+            "Finished" => Ok(HeartsGameInstanceState::Finished),
+            "Cancelled" => Ok(HeartsGameInstanceState::Cancelled),
+            _ => Err(format!("Invalid HeartsGameInstanceState: {}", string))
         }
     }
 }
@@ -109,6 +116,8 @@ impl<'a> From<&'a str> for HeartsGameInstanceState {
 mod tests {
     use super::*;
     use super::dto::*;
+
+    use try_from::TryFrom;
 
     extern crate env_logger;
     extern crate serde;
@@ -123,7 +132,7 @@ mod tests {
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
-        let game_status = GameStatus::from(game_status_dto);
+        GameStatus::try_from(game_status_dto).unwrap();
     }
 
     #[test]
@@ -132,7 +141,7 @@ mod tests {
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
-        let game_status = GameStatus::from(game_status_dto);
+        GameStatus::try_from(game_status_dto).unwrap();
     }
 
 }

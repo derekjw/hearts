@@ -17,6 +17,7 @@ mod player;
 mod game_status;
 mod deal;
 mod card_strategy;
+mod try_from;
 
 use player::Player;
 use player::PlayerName;

@@ -8,8 +8,10 @@ use card::Card;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::dto::DealDto;
-
 use player::PlayerName;
+use try_from::TryFrom;
+
+use std::str::FromStr;
 
 #[derive(Deserialize, Debug)]
 pub struct GameStatusDto {
@@ -47,15 +49,17 @@ pub struct GameStatusDto {
     is_my_turn: bool,
 }
 
-impl From<GameStatusDto> for GameStatus {
-    fn from(dto: GameStatusDto) -> GameStatus {
-        GameStatus {
+impl TryFrom<GameStatusDto> for GameStatus {
+    type Err = String;
+
+    fn try_from(dto: GameStatusDto) -> Result<GameStatus, String> {
+        Ok(GameStatus {
             current_game_id: dto.current_game_id,
-            current_game_state: GameInstanceState::from(&dto.current_game_state as &str),
+            current_game_state: try!(GameInstanceState::from_str(&dto.current_game_state)),
             current_round_id: dto.current_round_id,
-            current_round_state: RoundState::from(&dto.current_round_state as &str),
+            current_round_state: try!(RoundState::from_str(&dto.current_round_state)),
             round_parameters: RoundParameters::from(dto.round_parameters),
-            my_game_state: HeartsGameInstanceState::from(&dto.my_game_state as &str),
+            my_game_state: try!(HeartsGameInstanceState::from_str(&dto.my_game_state)),
             my_game_players: dto.my_game_participants.into_iter().map(|participant| participant.team_name).collect(),
             my_initial_hand: dto.my_initial_hand.into_iter().map(Card::from).collect(),
             my_final_hand: dto.my_final_hand.into_iter().map(Card::from).collect(),
@@ -63,7 +67,7 @@ impl From<GameStatusDto> for GameStatus {
             my_game_deals: dto.my_game_deals.into_iter().map(Deal::from).collect(),
             my_in_progress_deal: dto.my_in_progress_deal.map(Deal::from),
             is_my_turn: dto.is_my_turn,
-        }
+        })
     }
 }
 

@@ -6,6 +6,8 @@ use game_status::{
     HeartsGameInstanceState
 };
 use game_status::dto::GameStatusDto;
+use try_from::TryFrom;
+
 use std::io::Read;
 use std::collections::BTreeSet;
 use std::time::Duration;
@@ -56,6 +58,14 @@ struct GameResponse {
     data: String,
 }
 
+#[derive(Debug)]
+pub enum HeartsFailure {
+    Json(String),
+    Http(String),
+    Parsing(String),
+    Game(String),
+}
+
 pub struct Player<A: CardStrategy> {
     player_name: PlayerName,
     password: Password,
@@ -83,15 +93,19 @@ impl<A: CardStrategy> Player<A> {
         self.check_server_connectivity();
         let mut running = true;
         while running {
-            let game_status = self.get_game_status();
-            let state = &game_status.current_game_state;
-            self.update_game_state(state);
-            match state {
-                &GameInstanceState::Open => self.on_game_open(),
-                &GameInstanceState::Finished => running = false,
-                &GameInstanceState::Cancelled => running = false,
-                &GameInstanceState::Running => self.on_game_running(&game_status),
-                _ => ()
+            match self.get_game_status() {
+                Ok(game_status) => {
+                    let state = &game_status.current_game_state;
+                    self.update_game_state(state);
+                    match state {
+                        &GameInstanceState::Open => self.on_game_open(),
+                        &GameInstanceState::Finished => running = false,
+                        &GameInstanceState::Cancelled => running = false,
+                        &GameInstanceState::Running => self.on_game_running(&game_status),
+                        _ => ()
+                    }
+                }
+                Err(e) => error!("Unexpected failure: {:?}", e)
             }
             thread::sleep(Duration::new(1, 0));
         }
@@ -196,7 +210,7 @@ impl<A: CardStrategy> Player<A> {
         match result {
             Err(e) => error!("Problem while passing: {}", e),
             Ok(mut response) => {
-                let game_response = self.parse_game_response(&mut response);
+                let game_response = self.parse_game_response(&mut response).unwrap();
                 if game_response.has_error {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
@@ -226,7 +240,7 @@ impl<A: CardStrategy> Player<A> {
         match result {
             Err(e) => error!("Problem while playing card: {}", e),
             Ok(mut response) => {
-                let game_response = self.parse_game_response(&mut response);
+                let game_response = self.parse_game_response(&mut response).unwrap();
                 if game_response.has_error {
                     panic!("Game response fault: {:?}", game_response.fault)
                 } else {
@@ -251,22 +265,22 @@ impl<A: CardStrategy> Player<A> {
             .is_ok()
     }
 
-    fn get_game_status(&self) -> GameStatus {
+    fn get_game_status(&self) -> Result<GameStatus, HeartsFailure> {
         let result = self.client
             .get(&format!("{}/gamestatus", &self.base_url))
             .header(self.authorization())
             .send();
 
         match result {
-            Err(e) => panic!("OH NOES {:?}", e),
+            Err(e) => Err(HeartsFailure::Http(format!("OH NOES {:?}", e))),
             Ok(mut response) => {
-                let game_response = self.parse_game_response(&mut response);
+                let game_response = try!(self.parse_game_response(&mut response));
                 if game_response.has_error {
-                    panic!("Game response fault: {:?}", game_response.fault)
+                    Err(HeartsFailure::Game(format!("Game response fault: {:?}", game_response.fault)))
                 } else {
                     match serde_json::from_str::<GameStatusDto>(&game_response.data) {
-                        Ok(game_status_dto) => GameStatus::from(game_status_dto),
-                        Err(e) => panic!("Failure to parse GameStatus: {:?}", e)
+                        Ok(game_status_dto) => GameStatus::try_from(game_status_dto).map_err(|e| HeartsFailure::Parsing(e)),
+                        Err(e) => Err(HeartsFailure::Json(format!("Failure to parse GameStatus: {:?}", e)))
                     }
                 }
             }
@@ -281,11 +295,11 @@ impl<A: CardStrategy> Player<A> {
             .is_ok()
     }
 
-    fn parse_game_response(&self, response: &mut Response) -> GameResponse {
+    fn parse_game_response(&self, response: &mut Response) -> Result<GameResponse, HeartsFailure> {
         assert_eq!(hyper::Ok, response.status);
         let mut response_body = String::new();
-        response.read_to_string(&mut response_body).unwrap();
-        serde_json::from_str(&response_body).unwrap()
+        try!(response.read_to_string(&mut response_body).map_err(|e| HeartsFailure::Http(format!("Failure reading game response body: {:?}", e))));
+        serde_json::from_str(&response_body).map_err(|e| HeartsFailure::Json(format!("Failure to parse game response json: {:?}", e)))
     }
 
     fn authorization(&self) -> header::Authorization<header::Basic> {

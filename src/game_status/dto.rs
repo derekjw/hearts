@@ -8,7 +8,6 @@ use card::Card;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::dto::DealDto;
-use deal::dto::InProgressDealDto;
 
 use player::PlayerName;
 
@@ -43,7 +42,7 @@ pub struct GameStatusDto {
     #[serde(rename="MyGameDeals", default)]
     my_game_deals: Vec<DealDto>,
     #[serde(rename="MyInProgressDeal", default)]
-    my_in_progress_deal: Option<InProgressDealDto>,
+    my_in_progress_deal: Option<DealDto>,
     #[serde(rename="IsMyTurn")]
     is_my_turn: bool,
 }

@@ -4,14 +4,12 @@ use player::PlayerName;
 use card::Card;
 use card::Suit;
 
-use std::collections::BTreeSet;
-
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone)]
 pub struct Deal {
     pub deal_number: u32,
     pub initiator: Option<PlayerName>,
     pub suit: Option<Suit>,
-    pub deal_cards: BTreeSet<DealCard>,
+    pub deal_cards: Vec<DealCard>,
     pub deal_winner: Option<PlayerName>,
 }
 

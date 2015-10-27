@@ -9,6 +9,10 @@ use std::collections::BTreeMap;
 #[derive(Debug)]
 pub struct MyCardStrategy;
 
+/*
+    Play 2 of clubs if in hand.
+    If going to win a deal, do so with highest ranking card.
+*/
 impl MyCardStrategy {
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus, player_name: &PlayerName) -> (i32, i32, i32, i32) {
         let card_penalty_to_me = MyCardStrategy::card_penalty_to_me(card, game_status, player_name);

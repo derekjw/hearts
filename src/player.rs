@@ -7,6 +7,8 @@ use game_status::{
 };
 use game_status::dto::GameStatusDto;
 use try_from::TryFrom;
+use error::Error;
+use error::Result;
 
 use std::io::Read;
 use std::collections::BTreeSet;
@@ -58,14 +60,6 @@ struct GameResponse {
     data: String,
 }
 
-#[derive(Debug)]
-pub enum HeartsFailure {
-    Json(String),
-    Http(String),
-    Parsing(String),
-    Game(String),
-}
-
 pub struct Player<A: CardStrategy> {
     player_name: PlayerName,
     password: Password,
@@ -97,12 +91,25 @@ impl<A: CardStrategy> Player<A> {
                 Ok(game_status) => {
                     let state = &game_status.current_game_state;
                     self.update_game_state(state);
-                    match state {
-                        &GameInstanceState::Open => self.on_game_open(),
-                        &GameInstanceState::Finished => running = false,
-                        &GameInstanceState::Cancelled => running = false,
+                    let result = match state {
+                        &GameInstanceState::Open => {
+                            self.on_game_open();
+                            Ok(())
+                        }
+                        &GameInstanceState::Finished => {
+                            running = false;
+                            Ok(())
+                        }
+                        &GameInstanceState::Cancelled => {
+                            running = false;
+                            Ok(())
+                        }
                         &GameInstanceState::Running => self.on_game_running(&game_status),
-                        _ => ()
+                        _ => Ok(())
+                    };
+                    match result {
+                        Ok(()) => (),
+                        Err(e) => error!("Unexpected failure: {}", e)
                     }
                 }
                 Err(e) => error!("Unexpected failure: {:?}", e)
@@ -132,46 +139,50 @@ impl<A: CardStrategy> Player<A> {
         }
     }
 
-    fn on_game_running(&mut self, game_status: &GameStatus) {
+    fn on_game_running(&mut self, game_status: &GameStatus) -> Result<()> {
         if game_status.current_round_id > 0 {
             self.update_activity_tracker(format!("Round {} - {:?}", game_status.current_round_id, game_status.current_round_state));
 
             match game_status.current_round_state {
                 RoundState::Running => self.on_round_running(game_status),
-                _ => ()
+                _ => Ok(())
             }
+        } else {
+            Ok(())
         }
     }
 
-    fn on_round_running(&mut self, game_status: &GameStatus) {
+    fn on_round_running(&mut self, game_status: &GameStatus) -> Result<()> {
         self.update_activity_tracker(format!("My game - Round {} {:?}", game_status.current_round_id, game_status.my_game_state));
 
         match game_status.my_game_state {
             HeartsGameInstanceState::Passing => self.on_passing(game_status),
             HeartsGameInstanceState::Dealing => self.on_dealing(game_status),
-            _ => ()
+            _ => Ok(())
         }
     }
 
-    fn on_passing(&mut self, game_status: &GameStatus) {
+    fn on_passing(&mut self, game_status: &GameStatus) -> Result<()> {
         self.display_my_current_hand(game_status);
         let key_passing = format!("Passing - Round {}", game_status.current_round_id);
         if !self.player_activity_tracker.contains(&key_passing) {
-            self.do_passing_activity(game_status);
+            try!(self.do_passing_activity(game_status));
             self.player_activity_tracker.insert(key_passing);
         }
+        Ok(())
     }
 
-    fn on_dealing(&mut self, game_status: &GameStatus) {
+    fn on_dealing(&mut self, game_status: &GameStatus) -> Result<()> {
         if game_status.is_my_turn {
             self.display_my_current_hand(game_status);
             let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
             let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
             if !self.player_activity_tracker.contains(&key_dealing) {
-                self.do_dealing_activity(game_status);
+                try!(self.do_dealing_activity(game_status));
                 self.player_activity_tracker.insert(key_dealing);
             }
         }
+        Ok(())
     }
 
     fn display_my_current_hand(&mut self, game_status: &GameStatus) {
@@ -193,61 +204,45 @@ impl<A: CardStrategy> Player<A> {
 
     }
 
-    fn do_passing_activity(&mut self, game_status: &GameStatus) {
+    fn do_passing_activity(&mut self, game_status: &GameStatus) -> Result<()> {
         let number_of_cards_to_be_passed = game_status.round_parameters.number_of_cards_to_be_passed;
         info!("{} cards need to be passed to the right.", number_of_cards_to_be_passed);
         let cards_to_pass = self.card_strategy.pass_cards(game_status);
 
-        let serialized_cards_to_pass = serde_json::to_string(&cards_to_pass).unwrap();
+        let serialized_cards_to_pass = try!(serde_json::to_string(&cards_to_pass).map_err(Error::from));
 
-        let result = self.client
+        self.client
             .post(&format!("{}/passcards", self.base_url))
             .header(self.authorization())
             .header(header::ContentType::json())
             .body(&serialized_cards_to_pass)
-            .send();
+            .send()
+            .map_err(Error::from)
+            .and_then(Self::parse_game_response)
+            .map(|data| {
+                let passed_cards = cards_to_pass.iter()
+                    .map(|card| format!("{}", card))
+                    .collect::<Vec<String>>()
+                    .join(", ");
 
-        match result {
-            Err(e) => error!("Problem while passing: {}", e),
-            Ok(mut response) => {
-                let game_response = self.parse_game_response(&mut response).unwrap();
-                if game_response.has_error {
-                    panic!("Game response fault: {:?}", game_response.fault)
-                } else {
-                    let passed_cards = cards_to_pass.iter()
-                        .map(|card| format!("{}", card))
-                        .collect::<Vec<String>>()
-                        .join(", ");
-
-                    info!("{} cards passed successfully. Cards are : {}", number_of_cards_to_be_passed, passed_cards);
-                }
-            }
-        }
+                info!("{} cards passed successfully. Cards are : {}", number_of_cards_to_be_passed, passed_cards);
+            })
     }
 
-    fn do_dealing_activity(&mut self, game_status: &GameStatus) {
+    fn do_dealing_activity(&mut self, game_status: &GameStatus) -> Result<()> {
         let card_to_deal = self.card_strategy.play_card(game_status, &self.player_name);
 
-        let serialized_card_to_deal = serde_json::to_string(&card_to_deal).unwrap();
+        let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal).map_err(Error::from));
 
-        let result = self.client
+        self.client
             .post(&format!("{}/playcard", self.base_url))
             .header(self.authorization())
             .header(header::ContentType::json())
             .body(&serialized_card_to_deal)
-            .send();
-
-        match result {
-            Err(e) => error!("Problem while playing card: {}", e),
-            Ok(mut response) => {
-                let game_response = self.parse_game_response(&mut response).unwrap();
-                if game_response.has_error {
-                    panic!("Game response fault: {:?}", game_response.fault)
-                } else {
-                    info!("{} played Successfully", card_to_deal);
-                }
-            }
-        }
+            .send()
+            .map_err(Error::from)
+            .and_then(Self::parse_game_response)
+            .map(|data| info!("{} played Successfully", card_to_deal))
     }
 
     fn check_server_connectivity(&self) {
@@ -265,26 +260,14 @@ impl<A: CardStrategy> Player<A> {
             .is_ok()
     }
 
-    fn get_game_status(&self) -> Result<GameStatus, HeartsFailure> {
-        let result = self.client
+    fn get_game_status(&self) -> Result<GameStatus> {
+        self.client
             .get(&format!("{}/gamestatus", &self.base_url))
             .header(self.authorization())
-            .send();
-
-        match result {
-            Err(e) => Err(HeartsFailure::Http(format!("OH NOES {:?}", e))),
-            Ok(mut response) => {
-                let game_response = try!(self.parse_game_response(&mut response));
-                if game_response.has_error {
-                    Err(HeartsFailure::Game(format!("Game response fault: {:?}", game_response.fault)))
-                } else {
-                    match serde_json::from_str::<GameStatusDto>(&game_response.data) {
-                        Ok(game_status_dto) => GameStatus::try_from(game_status_dto).map_err(|e| HeartsFailure::Parsing(e)),
-                        Err(e) => Err(HeartsFailure::Json(format!("Failure to parse GameStatus: {:?}", e)))
-                    }
-                }
-            }
-        }
+            .send()
+            .map_err(Error::from)
+            .and_then(Self::parse_game_response)
+            .and_then(Self::parse_game_status)
     }
 
     fn join_game(&self) -> bool {
@@ -295,11 +278,23 @@ impl<A: CardStrategy> Player<A> {
             .is_ok()
     }
 
-    fn parse_game_response(&self, response: &mut Response) -> Result<GameResponse, HeartsFailure> {
+    fn parse_game_status(game_response: String) -> Result<GameStatus> {
+        serde_json::from_str::<GameStatusDto>(&game_response)
+            .map_err(Error::from)
+            .and_then(GameStatus::try_from)
+    }
+
+    fn parse_game_response(response: Response) -> Result<String> {
         assert_eq!(hyper::Ok, response.status);
+        let mut response = response;
         let mut response_body = String::new();
-        try!(response.read_to_string(&mut response_body).map_err(|e| HeartsFailure::Http(format!("Failure reading game response body: {:?}", e))));
-        serde_json::from_str(&response_body).map_err(|e| HeartsFailure::Json(format!("Failure to parse game response json: {:?}", e)))
+        try!(response.read_to_string(&mut response_body).map_err(Error::from));
+        let game_response: GameResponse = try!(serde_json::from_str(&response_body).map_err(Error::from));
+        if game_response.has_error {
+            Err(Error::game(game_response.fault))
+        } else {
+            Ok(game_response.data)
+        }
     }
 
     fn authorization(&self) -> header::Authorization<header::Basic> {

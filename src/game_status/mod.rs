@@ -4,6 +4,8 @@ use card::Card;
 use deal::Deal;
 use player::PlayerName;
 
+use error::Error;
+
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
 use std::str::FromStr;
@@ -36,9 +38,9 @@ pub enum GameInstanceState {
 }
 
 impl FromStr for GameInstanceState {
-    type Err = String;
+    type Err = Error;
 
-    fn from_str(string: &str) -> Result<GameInstanceState, String> {
+    fn from_str(string: &str) -> Result<GameInstanceState, Error> {
         match string {
             "NotStarted" => Ok(GameInstanceState::NotStarted),
             "Initiated" => Ok(GameInstanceState::Initiated),
@@ -46,7 +48,7 @@ impl FromStr for GameInstanceState {
             "Running" => Ok(GameInstanceState::Running),
             "Finished" => Ok(GameInstanceState::Finished),
             "Cancelled" => Ok(GameInstanceState::Cancelled),
-            _ => Err(format!("Invalid GameInstanceState: {}", string))
+            _ => Err(Error::parsing("GameInstanceState", string))
         }
     }
 }
@@ -61,16 +63,16 @@ pub enum RoundState {
 }
 
 impl FromStr for RoundState {
-    type Err = String;
+    type Err = Error;
 
-    fn from_str(string: &str) -> Result<RoundState, String> {
+    fn from_str(string: &str) -> Result<RoundState, Error> {
         match string {
             "NotStarted" => Ok(RoundState::NotStarted),
             "Initiated" => Ok(RoundState::Initiated),
             "Running" => Ok(RoundState::Running),
             "Finished" => Ok(RoundState::Finished),
             "Cancelled" => Ok(RoundState::Cancelled),
-            _ => Err(format!("Invalid RoundState: {}", string))
+            _ => Err(Error::parsing("RoundState", string))
         }
     }
 }
@@ -97,9 +99,9 @@ pub enum HeartsGameInstanceState {
 }
 
 impl FromStr for HeartsGameInstanceState {
-    type Err = String;
+    type Err = Error;
 
-    fn from_str(string: &str) -> Result<HeartsGameInstanceState, String> {
+    fn from_str(string: &str) -> Result<HeartsGameInstanceState, Error> {
         match string {
             "NotStarted" => Ok(HeartsGameInstanceState::NotStarted),
             "Initiated" => Ok(HeartsGameInstanceState::Initiated),
@@ -107,7 +109,7 @@ impl FromStr for HeartsGameInstanceState {
             "Dealing" => Ok(HeartsGameInstanceState::Dealing),
             "Finished" => Ok(HeartsGameInstanceState::Finished),
             "Cancelled" => Ok(HeartsGameInstanceState::Cancelled),
-            _ => Err(format!("Invalid HeartsGameInstanceState: {}", string))
+            _ => Err(Error::parsing("HeartsGameInstanceState", string))
         }
     }
 }

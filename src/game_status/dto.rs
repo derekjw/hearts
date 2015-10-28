@@ -10,6 +10,7 @@ use deal::Deal;
 use deal::dto::DealDto;
 use player::PlayerName;
 use try_from::TryFrom;
+use error::Error;
 
 use std::str::FromStr;
 
@@ -50,9 +51,9 @@ pub struct GameStatusDto {
 }
 
 impl TryFrom<GameStatusDto> for GameStatus {
-    type Err = String;
+    type Err = Error;
 
-    fn try_from(dto: GameStatusDto) -> Result<GameStatus, String> {
+    fn try_from(dto: GameStatusDto) -> Result<GameStatus, Error> {
         Ok(GameStatus {
             current_game_id: dto.current_game_id,
             current_game_state: try!(GameInstanceState::from_str(&dto.current_game_state)),

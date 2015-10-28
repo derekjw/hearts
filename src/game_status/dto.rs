@@ -10,7 +10,9 @@ use deal::Deal;
 use deal::dto::DealDto;
 use player::PlayerName;
 use try_from::TryFrom;
+use try_from::TryInto;
 use error::Error;
+use error::Result;
 
 use std::str::FromStr;
 
@@ -53,20 +55,24 @@ pub struct GameStatusDto {
 impl TryFrom<GameStatusDto> for GameStatus {
     type Err = Error;
 
-    fn try_from(dto: GameStatusDto) -> Result<GameStatus, Error> {
+    fn try_from(dto: GameStatusDto) -> Result<GameStatus> {
+        let my_in_progress_deal = match dto.my_in_progress_deal.map(Deal::try_from) {
+            Some(result) => result.map(|value| Some(value)),
+            None => Ok(None)
+        };
         Ok(GameStatus {
             current_game_id: dto.current_game_id,
             current_game_state: try!(GameInstanceState::from_str(&dto.current_game_state)),
             current_round_id: dto.current_round_id,
             current_round_state: try!(RoundState::from_str(&dto.current_round_state)),
-            round_parameters: RoundParameters::from(dto.round_parameters),
+            round_parameters: try!(RoundParameters::try_from(dto.round_parameters)),
             my_game_state: try!(HeartsGameInstanceState::from_str(&dto.my_game_state)),
             my_game_players: dto.my_game_participants.into_iter().map(|participant| participant.team_name).collect(),
-            my_initial_hand: dto.my_initial_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
-            my_final_hand: dto.my_final_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
-            my_current_hand: dto.my_current_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
-            my_game_deals: dto.my_game_deals.into_iter().map(Deal::try_from).map(|deal| deal.unwrap()).collect(),
-            my_in_progress_deal: dto.my_in_progress_deal.map(Deal::try_from).map(|deal| deal.unwrap()),
+            my_initial_hand: try!(dto.my_initial_hand.into_iter().map(Card::try_from).collect()),
+            my_final_hand: try!(dto.my_final_hand.into_iter().map(Card::try_from).collect()),
+            my_current_hand: try!(dto.my_current_hand.into_iter().map(Card::try_from).collect()),
+            my_game_deals: try!(dto.my_game_deals.into_iter().map(Deal::try_from).collect()),
+            my_in_progress_deal: try!(my_in_progress_deal),
             is_my_turn: dto.is_my_turn,
         })
     }
@@ -90,17 +96,18 @@ pub struct RoundParametersDto {
     card_points: Vec<CardPointsDto>
 }
 
-impl From<RoundParametersDto> for RoundParameters {
-    fn from(dto: RoundParametersDto) -> RoundParameters {
-        RoundParameters {
+impl TryFrom<RoundParametersDto> for RoundParameters {
+    type Err = Error;
+    fn try_from(dto: RoundParametersDto) -> Result<RoundParameters> {
+        Ok(RoundParameters {
             round_id: dto.round_id,
             initiation_phase_in_seconds: dto.initiation_phase_in_seconds,
             passing_phase_in_seconds: dto.passing_phase_in_seconds,
             dealing_phase_in_seconds: dto.dealing_phase_in_seconds,
             finishing_phase_in_seconds: dto.finishing_phase_in_seconds,
             number_of_cards_to_be_passed: dto.number_of_cards_to_be_passed,
-            card_points: dto.card_points.into_iter().map(CardPointsDto::into).collect(),
-        }
+            card_points: try!(dto.card_points.into_iter().map(CardPointsDto::try_into).collect()),
+        })
     }
 }
 
@@ -112,9 +119,11 @@ pub struct CardPointsDto {
     points: i32,
 }
 
-impl From<CardPointsDto> for (Card, i32) {
-    fn from(dto: CardPointsDto) -> (Card, i32) {
-        (Card::try_from(dto.card).unwrap(), dto.points)
+impl TryFrom<CardPointsDto> for (Card, i32) {
+    type Err = Error;
+
+    fn try_from(dto: CardPointsDto) -> Result<(Card, i32)> {
+        Ok((try!(Card::try_from(dto.card)), dto.points))
     }
 }
 

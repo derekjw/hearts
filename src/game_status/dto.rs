@@ -62,11 +62,11 @@ impl TryFrom<GameStatusDto> for GameStatus {
             round_parameters: RoundParameters::from(dto.round_parameters),
             my_game_state: try!(HeartsGameInstanceState::from_str(&dto.my_game_state)),
             my_game_players: dto.my_game_participants.into_iter().map(|participant| participant.team_name).collect(),
-            my_initial_hand: dto.my_initial_hand.into_iter().map(Card::from).collect(),
-            my_final_hand: dto.my_final_hand.into_iter().map(Card::from).collect(),
-            my_current_hand: dto.my_current_hand.into_iter().map(Card::from).collect(),
-            my_game_deals: dto.my_game_deals.into_iter().map(Deal::from).collect(),
-            my_in_progress_deal: dto.my_in_progress_deal.map(Deal::from),
+            my_initial_hand: dto.my_initial_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
+            my_final_hand: dto.my_final_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
+            my_current_hand: dto.my_current_hand.into_iter().map(Card::try_from).map(|card| card.unwrap()).collect(),
+            my_game_deals: dto.my_game_deals.into_iter().map(Deal::try_from).map(|deal| deal.unwrap()).collect(),
+            my_in_progress_deal: dto.my_in_progress_deal.map(Deal::try_from).map(|deal| deal.unwrap()),
             is_my_turn: dto.is_my_turn,
         })
     }
@@ -114,7 +114,7 @@ pub struct CardPointsDto {
 
 impl From<CardPointsDto> for (Card, i32) {
     fn from(dto: CardPointsDto) -> (Card, i32) {
-        (Card::from(dto.card), dto.points)
+        (Card::try_from(dto.card).unwrap(), dto.points)
     }
 }
 

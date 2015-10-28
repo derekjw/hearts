@@ -4,6 +4,9 @@ use card::Suit;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::DealCard;
+use try_from::TryFrom;
+use error::Error;
+use error::Result;
 
 use std::str::FromStr;
 
@@ -21,16 +24,18 @@ pub struct DealDto {
     deal_winner: Option<PlayerName>,
 }
 
-impl From<DealDto> for Deal {
-    fn from(dto: DealDto) -> Deal {
+impl TryFrom<DealDto> for Deal {
+    type Err = Error;
+    fn try_from(dto: DealDto) -> Result<Deal> {
         let deal_cards: Vec<DealCard> = dto.deal_cards.into_iter().map(DealCard::from).collect();
-        Deal {
+        let suit = try!(Suit::from_str(&dto.suit_type));
+        Ok(Deal {
             deal_number: dto.deal_number,
             initiator: dto.initiator,
-            suit: if deal_cards.is_empty() { None } else { Some(Suit::from_str(&dto.suit_type).unwrap()) },
+            suit: if deal_cards.is_empty() { None } else { Some(suit) },
             deal_cards: deal_cards,
             deal_winner: dto.deal_winner,
-        }
+        })
     }
 }
 
@@ -46,7 +51,7 @@ impl From<DealCardDto> for DealCard {
     fn from(dto: DealCardDto) -> DealCard {
         DealCard {
             player_name: dto.team_name.clone(),
-            card: Card::from(dto.card)
+            card: Card::try_from(dto.card).unwrap()
         }
     }
 }

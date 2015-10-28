@@ -1,3 +1,6 @@
+use error::Error;
+use error::Result;
+
 use std::str::FromStr;
 use std::fmt;
 
@@ -40,15 +43,15 @@ impl From<Suit> for String {
 }
 
 impl FromStr for Suit {
-    type Err = String;
+    type Err = Error;
 
-    fn from_str(string: &str) -> Result<Suit, String> {
+    fn from_str(string: &str) -> Result<Suit> {
         match string {
             "Heart" => Ok(Suit::Heart),
             "Diamond" => Ok(Suit::Diamond),
             "Spade" => Ok(Suit::Spade),
             "Club" => Ok(Suit::Club),
-            other => Err(format!("Not a valid suit: {}", other))
+            _ => Err(Error::parsing("Suit", string))
         }
     }
 }

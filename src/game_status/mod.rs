@@ -120,6 +120,7 @@ mod tests {
     use super::dto::*;
 
     use try_from::TryFrom;
+    use error::Error;
 
     extern crate env_logger;
     extern crate serde;
@@ -133,7 +134,7 @@ mod tests {
         let mut game_status_file = File::open("gamestatus.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
@@ -142,7 +143,7 @@ mod tests {
         let mut game_status_file = File::open("gamestatus2.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 

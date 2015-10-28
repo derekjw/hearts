@@ -1,3 +1,6 @@
+use error::Error;
+use error::Result;
+
 use std::str::FromStr;
 use std::fmt;
 
@@ -80,9 +83,9 @@ impl From<Rank> for &'static str {
 }
 
 impl FromStr for Rank {
-    type Err = String;
+    type Err = Error;
 
-    fn from_str(string: &str) -> Result<Rank, String> {
+    fn from_str(string: &str) -> Result<Rank> {
         match string {
             "2" => Ok(Rank::Two),
             "3" => Ok(Rank::Three),
@@ -97,7 +100,7 @@ impl FromStr for Rank {
             "Q" => Ok(Rank::Queen),
             "K" => Ok(Rank::King),
             "A" => Ok(Rank::Ace),
-            other => Err(format!("Not a valid rank: {}", other))
+            _ => Err(Error::parsing("Rank", string))
         }
     }
 }

@@ -67,6 +67,7 @@ pub struct Player<A: CardStrategy> {
     card_strategy: A,
     player_activity_tracker: BTreeSet<String>,
     client: Client,
+    running: bool,
 }
 
 impl<A: CardStrategy> Player<A> {
@@ -79,28 +80,23 @@ impl<A: CardStrategy> Player<A> {
             card_strategy: card_strategy,
             player_activity_tracker: BTreeSet::new(),
             client: Client::new(),
+            running: false,
         }
     }
 
     pub fn play(mut self) {
         self.player_activity_tracker.clear();
         self.check_server_connectivity();
-        let mut running = true;
-        while running {
+        self.running = true;
+        while self.running {
             self.get_game_status()
                 .and_then(|game_status| {
                     let state = &game_status.current_game_state;
                     self.update_game_state(state);
                     match state {
                         &GameInstanceState::Open => self.on_game_open(),
-                        &GameInstanceState::Finished => {
-                            running = false;
-                            Ok(())
-                        }
-                        &GameInstanceState::Cancelled => {
-                            running = false;
-                            Ok(())
-                        }
+                        &GameInstanceState::Finished => self.on_game_finished(),
+                        &GameInstanceState::Cancelled => self.on_game_finished(),
                         &GameInstanceState::Running => self.on_game_running(&game_status),
                         _ => Ok(())
                     }
@@ -129,6 +125,11 @@ impl<A: CardStrategy> Player<A> {
                 self.player_activity_tracker.insert(key_join_status);
             }
         };
+        Ok(())
+    }
+
+    fn on_game_finished(&mut self) -> Result<()> {
+        self.running = false;
         Ok(())
     }
 

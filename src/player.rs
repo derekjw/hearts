@@ -87,15 +87,12 @@ impl<A: CardStrategy> Player<A> {
         self.check_server_connectivity();
         let mut running = true;
         while running {
-            match self.get_game_status() {
-                Ok(game_status) => {
+            self.get_game_status()
+                .and_then(|game_status| {
                     let state = &game_status.current_game_state;
                     self.update_game_state(state);
-                    let result = match state {
-                        &GameInstanceState::Open => {
-                            self.on_game_open();
-                            Ok(())
-                        }
+                    match state {
+                        &GameInstanceState::Open => self.on_game_open(),
                         &GameInstanceState::Finished => {
                             running = false;
                             Ok(())
@@ -106,14 +103,9 @@ impl<A: CardStrategy> Player<A> {
                         }
                         &GameInstanceState::Running => self.on_game_running(&game_status),
                         _ => Ok(())
-                    };
-                    match result {
-                        Ok(()) => (),
-                        Err(e) => error!("Unexpected failure: {}", e)
                     }
-                }
-                Err(e) => error!("Unexpected failure: {:?}", e)
-            }
+                })
+                .unwrap_or_else(|e| error!("Unexpected failure: {}", e));
             thread::sleep(Duration::new(1, 0));
         }
     }
@@ -129,14 +121,15 @@ impl<A: CardStrategy> Player<A> {
         }
     }
 
-    fn on_game_open(&mut self) {
+    fn on_game_open(&mut self) -> Result<()> {
         let key_join_status = "JoinGame".to_owned();
         if !self.player_activity_tracker.contains(&key_join_status) {
             if self.join_game() {
                 info!("Join successful");
                 self.player_activity_tracker.insert(key_join_status);
             }
-        }
+        };
+        Ok(())
     }
 
     fn on_game_running(&mut self, game_status: &GameStatus) -> Result<()> {

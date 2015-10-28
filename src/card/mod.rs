@@ -67,6 +67,7 @@ mod tests {
     use super::*;
 
     use std::str::FromStr;
+    use std::error::Error;
 
     #[test]
     fn reversible_suit() {
@@ -78,9 +79,9 @@ mod tests {
         assert_eq!(Rank::Ace, Rank::from_str(Rank::Ace.into()).unwrap());
     }
 
-    // #[test]
-    // fn invalid_rank() {
-    //     assert_eq!(Err(Error::parsing("Rank", "1".to_owned())), Rank::from_str("1").unwrap());
-    // }
+    #[test]
+    fn invalid_rank() {
+        assert_eq!("Error while parsing \"1\" as Rank", Rank::from_str("1").unwrap_err().description());
+    }
 
 }

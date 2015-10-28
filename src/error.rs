@@ -13,7 +13,7 @@ pub enum Error {
     Http(HyperError),
     Io(IoError),
     Json(SerdeJsonError),
-    Parsing { source: &'static str, string: String },
+    Parsing(String),
     #[doc(hidden)]
     __Nonexhaustive(Void)
 }
@@ -36,11 +36,11 @@ impl fmt::Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::Game(_) => "Server reported an error",
+            Error::Game(ref s) => s,
             Error::Http(ref e) => e.description(),
             Error::Io(ref e) => e.description(),
             Error::Json(ref e) => e.description(),
-            Error::Parsing { source: _, string: _ } => "Error while parsing string",
+            Error::Parsing(ref s) => s,
             Error::__Nonexhaustive(ref void) =>  match *void {}
         }
     }
@@ -56,11 +56,8 @@ impl StdError for Error {
 }
 
 impl Error {
-    pub fn parsing<A: Into<String>>(source: &'static str, string: A) -> Error {
-        Error::Parsing {
-            source: source,
-            string: string.into(),
-        }
+    pub fn parsing(source: &str, string: &str) -> Error {
+        Error::Parsing(format!("Error while parsing \"{}\" as {}", string, source))
     }
 
     pub fn game<A: Into<String>>(cause: Option<A>) -> Error {

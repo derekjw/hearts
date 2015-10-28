@@ -14,17 +14,6 @@ pub enum Error {
     Io(IoError),
     Json(SerdeJsonError),
     Parsing(String),
-    #[doc(hidden)]
-    __Nonexhaustive(Void)
-}
-
-#[doc(hidden)]
-pub enum Void {}
-
-impl fmt::Debug for Void {
-    fn fmt(&self, _: &mut fmt::Formatter) -> fmt::Result {
-        match *self {}
-    }
 }
 
 impl fmt::Display for Error {
@@ -41,7 +30,6 @@ impl StdError for Error {
             Error::Io(ref e) => e.description(),
             Error::Json(ref e) => e.description(),
             Error::Parsing(ref s) => s,
-            Error::__Nonexhaustive(ref void) =>  match *void {}
         }
     }
 

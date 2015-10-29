@@ -60,14 +60,16 @@ impl CardStrategy for DefensiveCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
         // Need to order cards by potential to win lowest penalty hands
-        let mut initial_hand: Vec<&Card> = game_status.my_initial_hand.iter().collect();
+        let mut initial_hand = game_status.my_initial_hand.iter().collect::<Vec<&Card>>();
         initial_hand.reverse();
         initial_hand.into_iter().take(3).collect()
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
         let current_suit = game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit);
-        let mut valid_cards: Vec<&Card> = game_status.my_current_hand.iter().filter(|card| Some(card.suit) == current_suit).collect();
+        let mut valid_cards = game_status.my_current_hand.iter()
+            .filter(|card| Some(card.suit) == current_suit)
+            .collect::<Vec<&Card>>();
 
         if valid_cards.is_empty() {
             valid_cards.extend(&game_status.my_current_hand);

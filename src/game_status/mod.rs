@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     fn read_json() {
-        let mut game_status_file = File::open("gamestatus.json").unwrap();
+        let mut game_status_file = File::open("samples/gamestatus.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
@@ -140,7 +140,7 @@ mod tests {
 
     #[test]
     fn read_json2() {
-        let mut game_status_file = File::open("gamestatus2.json").unwrap();
+        let mut game_status_file = File::open("samples/gamestatus2.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
@@ -149,7 +149,7 @@ mod tests {
 
     #[test]
     fn read_json3() {
-        let mut game_status_file = File::open("gamestatus3.json").unwrap();
+        let mut game_status_file = File::open("samples/gamestatus3.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
@@ -158,7 +158,16 @@ mod tests {
 
     #[test]
     fn read_json4() {
-        let mut game_status_file = File::open("gamestatus4.json").unwrap();
+        let mut game_status_file = File::open("samples/gamestatus4.json").unwrap();
+        let mut game_status_string = String::new();
+        game_status_file.read_to_string(&mut game_status_string).unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        GameStatus::try_from(game_status_dto).unwrap();
+    }
+
+    #[test]
+    fn read_json5() {
+        let mut game_status_file = File::open("samples/gamestatus5.json").unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
         let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();

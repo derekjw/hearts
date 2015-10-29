@@ -138,5 +138,5 @@ pub struct GameParticipantDto {
     #[serde(rename="HasTurn")]
     has_turn: bool,
     #[serde(rename="CurrentScore")]
-    current_score: u32,
+    current_score: i32,
 }

@@ -23,7 +23,7 @@ mod error;
 use player::Player;
 use player::PlayerName;
 use player::Password;
-use card_strategy::MyCardStrategy;
+use card_strategy::DefensiveCardStrategy;
 
 #[allow(dead_code)]
 fn main() {
@@ -35,7 +35,7 @@ fn main() {
     info!("Start Game");
 
     // Settings.init();
-    let player = Player::new(player_name, password, "localhost:2015", MyCardStrategy);
+    let player = Player::new(player_name, password, "localhost:2015", DefensiveCardStrategy);
     player.play();
 }
 

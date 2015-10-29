@@ -7,17 +7,17 @@ use player::PlayerName;
 use std::collections::BTreeMap;
 
 #[derive(Debug)]
-pub struct MyCardStrategy;
+pub struct DefensiveCardStrategy;
 
 /*
     Play 2 of clubs if in hand.
     If going to win a deal, do so with highest ranking card.
 */
-impl MyCardStrategy {
+impl DefensiveCardStrategy {
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus, player_name: &PlayerName) -> (i32, i32, i32, i32) {
-        let card_penalty_to_me = MyCardStrategy::card_penalty_to_me(card, game_status, player_name);
-        let card_penalty = 0 - MyCardStrategy::card_penalty(card, game_status);
-        let trouble = MyCardStrategy::trouble_score(card, game_status);
+        let card_penalty_to_me = Self::card_penalty_to_me(card, game_status, player_name);
+        let card_penalty = 0 - Self::card_penalty(card, game_status);
+        let trouble = Self::trouble_score(card, game_status);
         let card_rank = 0 - (u32::from(card.rank) as i32);
         (card_penalty_to_me, card_penalty, trouble, card_rank)
     }
@@ -29,15 +29,15 @@ impl MyCardStrategy {
     }
 
     fn card_penalty_to_me(card: &Card, game_status: &GameStatus, player_name: &PlayerName) -> i32 {
-        if MyCardStrategy::will_win_deal(card, game_status) {
-            MyCardStrategy::card_penalty(card, game_status)
+        if Self::will_win_deal(card, game_status) {
+            Self::card_penalty(card, game_status)
         } else {
             0
         }
     }
 
     fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
-        if MyCardStrategy::will_win_deal(card, game_status) {
+        if Self::will_win_deal(card, game_status) {
             u32::from(card.rank) as i32
         } else {
             0
@@ -55,7 +55,7 @@ impl MyCardStrategy {
     }
 }
 
-impl CardStrategy for MyCardStrategy {
+impl CardStrategy for DefensiveCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
         // Need to order cards by potential to win lowest penalty hands
@@ -73,7 +73,7 @@ impl CardStrategy for MyCardStrategy {
         }
 
         valid_cards.into_iter()
-            .map(|card| ((MyCardStrategy::score_card(card, game_status, player_name), card), card))
+            .map(|card| ((Self::score_card(card, game_status, player_name), card), card))
             .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>()
             .values()
             .next()

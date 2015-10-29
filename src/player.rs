@@ -203,7 +203,7 @@ impl<A: CardStrategy> Player<A> {
         info!("{} cards need to be passed to the right.", number_of_cards_to_be_passed);
         let cards_to_pass = self.card_strategy.pass_cards(game_status);
 
-        let serialized_cards_to_pass = try!(serde_json::to_string(&cards_to_pass).map_err(Error::from));
+        let serialized_cards_to_pass = try!(serde_json::to_string(&cards_to_pass));
 
         self.client
             .post(&format!("{}/passcards", self.base_url))
@@ -226,7 +226,7 @@ impl<A: CardStrategy> Player<A> {
     fn do_dealing_activity(&mut self, game_status: &GameStatus) -> Result<()> {
         let card_to_deal = self.card_strategy.play_card(game_status, &self.player_name);
 
-        let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal).map_err(Error::from));
+        let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal));
 
         self.client
             .post(&format!("{}/playcard", self.base_url))
@@ -282,8 +282,8 @@ impl<A: CardStrategy> Player<A> {
         assert_eq!(hyper::Ok, response.status);
         let mut response = response;
         let mut response_body = String::new();
-        try!(response.read_to_string(&mut response_body).map_err(Error::from));
-        let game_response: GameResponse = try!(serde_json::from_str(&response_body).map_err(Error::from));
+        try!(response.read_to_string(&mut response_body));
+        let game_response: GameResponse = try!(serde_json::from_str(&response_body));
         if game_response.has_error {
             Err(Error::game(game_response.fault))
         } else {

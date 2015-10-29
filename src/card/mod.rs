@@ -44,16 +44,15 @@ impl<'a> serde::ser::MapVisitor for CardMapVisitor<'a> {
         match self.state {
             0 => {
                 self.state += 1;
-                Ok(Some(try!(serializer.visit_struct_elt("Suit", Into::<&str>::into(self.value.suit)))))
+                Ok(Some(try!(serializer.visit_struct_elt::<&str>("Suit", self.value.suit.into()))))
             }
             1 => {
                 self.state += 1;
-                Ok(Some(try!(serializer.visit_struct_elt("Number", &u32::from(self.value.rank)))))
+                Ok(Some(try!(serializer.visit_struct_elt::<u32>("Number", self.value.rank.into()))))
             }
             2 => {
                 self.state += 1;
-                let rank_symbol: &str = self.value.rank.into();
-                Ok(Some(try!(serializer.visit_struct_elt("Symbol", rank_symbol))))
+                Ok(Some(try!(serializer.visit_struct_elt::<&str>("Symbol", self.value.rank.into()))))
             }
             _ => {
                 Ok(None)

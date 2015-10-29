@@ -52,9 +52,3 @@ fn main() {
     let player = Player::new(player_name, password, server, DefensiveCardStrategy);
     player.play();
 }
-
-struct Settings {
-    username: String,
-    password: String,
-    hostname: String,
-}

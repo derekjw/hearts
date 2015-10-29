@@ -44,7 +44,7 @@ impl<'a> serde::ser::MapVisitor for CardMapVisitor<'a> {
         match self.state {
             0 => {
                 self.state += 1;
-                Ok(Some(try!(serializer.visit_struct_elt("Suit", &String::from(self.value.suit)))))
+                Ok(Some(try!(serializer.visit_struct_elt("Suit", Into::<&str>::into(self.value.suit)))))
             }
             1 => {
                 self.state += 1;

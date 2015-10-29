@@ -35,13 +35,6 @@ impl From<Suit> for &'static str {
     }
 }
 
-impl From<Suit> for String {
-    fn from(suit: Suit) -> String {
-        let suit_str: &str = suit.into();
-        suit_str.to_owned()
-    }
-}
-
 impl FromStr for Suit {
     type Err = Error;
 

@@ -12,11 +12,10 @@ pub struct DefensiveCardStrategy;
 /*
     Play 2 of clubs if in hand.
     If going to win a deal, do so with highest ranking card.
-    Need strategy for winning negetive penalty hands
 */
 impl DefensiveCardStrategy {
-    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus, player_name: &PlayerName) -> (i32, i32, i32, i32) {
-        let card_penalty_to_me = Self::card_penalty_to_me(card, game_status, player_name);
+    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
+        let card_penalty_to_me = Self::card_penalty_to_me(card, game_status);
         let card_penalty = 0 - Self::card_penalty(card, game_status);
         let trouble = Self::trouble_score(card, game_status);
         let card_rank = 0 - (u32::from(card.rank) as i32);
@@ -29,7 +28,7 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
-    fn card_penalty_to_me(card: &Card, game_status: &GameStatus, player_name: &PlayerName) -> i32 {
+    fn card_penalty_to_me(card: &Card, game_status: &GameStatus) -> i32 {
         if Self::will_win_deal(card, game_status) {
             Self::card_penalty(card, game_status)
         } else {
@@ -39,7 +38,12 @@ impl DefensiveCardStrategy {
 
     fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
         if Self::will_win_deal(card, game_status) {
-            u32::from(card.rank) as i32
+            let trouble = u32::from(card.rank) as i32;
+            if Self::card_penalty_to_me(card, game_status) < 0 {
+                0 - trouble
+            } else {
+                trouble
+            }
         } else {
             0
         }
@@ -76,7 +80,7 @@ impl CardStrategy for DefensiveCardStrategy {
         }
 
         valid_cards.into_iter()
-            .map(|card| ((Self::score_card(card, game_status, player_name), card), card))
+            .map(|card| ((Self::score_card(card, game_status), card), card))
             .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>()
             .values()
             .next()

@@ -1,0 +1,9 @@
+{
+  "CurrentGameId": "5ab7c4d273a448e9a6b48d515ba1a39a",
+  "CurrentGameState": "Open",
+  "CurrentRoundId": 0,
+  "CurrentRoundState": "NotStarted",
+  "MyGameState": "NotStarted",
+  "MyGameStateDescription": "Hearts game is not started",
+  "IsMyTurn": false
+}

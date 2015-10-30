@@ -93,11 +93,11 @@ impl<A: CardStrategy> Player<A> {
                 .and_then(|game_status| {
                     let state = &game_status.current_game_state;
                     self.update_game_state(state);
-                    match state {
-                        &GameInstanceState::Open => self.on_game_open(),
-                        &GameInstanceState::Finished => self.on_game_finished(),
-                        &GameInstanceState::Cancelled => self.on_game_finished(),
-                        &GameInstanceState::Running => self.on_game_running(&game_status),
+                    match *state {
+                        GameInstanceState::Open => self.on_game_open(),
+                        GameInstanceState::Finished => self.on_game_finished(),
+                        GameInstanceState::Cancelled => self.on_game_finished(),
+                        GameInstanceState::Running => self.on_game_running(&game_status),
                         _ => Ok(())
                     }
                 })

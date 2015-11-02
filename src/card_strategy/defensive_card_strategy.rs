@@ -142,18 +142,18 @@ mod tests {
     }
 
     #[test]
-    fn should_play_heart() {
+    fn should_play_heart() { // Opening card should not try to win
         should_play("should play heart", Seven.of(Heart));
     }
 
     #[test]
-    fn should_play_high_rank_1() {
+    fn should_play_high_rank_1() { // Should get rid of high rank
         should_play("should play high rank 1", King.of(Diamond));
     }
 
     #[test]
-    fn should_play_high_rank_2() {
-        should_play("should play high rank 2", Jack.of(Spade));
+    fn should_play_high_rank_2() { // Should get rid of high risk high rank
+        should_play("should play high rank 2", Ace.of(Spade));
     }
 
 }

@@ -222,7 +222,7 @@ impl<A: CardStrategy> Player<A> {
             .send()
             .map_err(Error::from)
             .and_then(Self::parse_game_response)
-            .map(|data| {
+            .map(|_| {
                 let passed_cards = cards_to_pass.iter()
                     .map(|card| format!("{}", card))
                     .collect::<Vec<String>>()
@@ -245,7 +245,7 @@ impl<A: CardStrategy> Player<A> {
             .send()
             .map_err(Error::from)
             .and_then(Self::parse_game_response)
-            .map(|data| info!("{} played Successfully", card_to_deal))
+            .map(|_| info!("{} played Successfully", card_to_deal))
     }
 
     fn check_server_connectivity(&self) {

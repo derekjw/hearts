@@ -200,7 +200,7 @@ impl<A: CardStrategy> Player<A> {
         let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
         let dir_name = format!("game_log/{}", game_id);
         try!(fs::DirBuilder::new().recursive(true).create(&dir_name));
-        let file_name = format!("{}/{}-{}.json", dir_name, round_id, deal_number);
+        let file_name = format!("{}/{:02}-{:02}.json", dir_name, round_id, deal_number);
         let mut file = try!(File::create(file_name));
         let dto = GameStatusDto::from(game_status);
         let string = try!(serde_json::to_string_pretty(&dto));

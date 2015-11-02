@@ -23,22 +23,24 @@ use hyper::header;
 use serde_json;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone)]
-pub struct PlayerName (String);
+pub struct PlayerName(String);
 
 impl PlayerName {
     pub fn new<A>(value: A) -> PlayerName
     where A: Into<String> {
         PlayerName(value.into())
     }
+}
 
-    fn clone_string(&self) -> String {
-        let &PlayerName(ref string) = self;
-        string.clone()
+impl From<PlayerName> for String {
+    fn from(player: PlayerName) -> String {
+        let PlayerName(string) = player;
+        string
     }
 }
 
-#[derive(Debug, PartialEq, Eq)]
-pub struct Password (String);
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct Password(String);
 
 impl Password {
     pub fn new<A>(value: A) -> Password
@@ -49,6 +51,13 @@ impl Password {
     fn clone_string(&self) -> String {
         let &Password(ref string) = self;
         string.clone()
+    }
+}
+
+impl From<Password> for String {
+    fn from(password: Password) -> String {
+        let Password(string) = password;
+        string
     }
 }
 
@@ -294,8 +303,8 @@ impl<A: CardStrategy> Player<A> {
     fn authorization(&self) -> header::Authorization<header::Basic> {
         header::Authorization(
             header::Basic {
-                username: self.player_name.clone_string(),
-                password: Some(self.password.clone_string())
+                username: self.player_name.clone().into(),
+                password: Some(self.password.clone().into())
             }
         )
     }

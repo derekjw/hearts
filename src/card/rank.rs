@@ -1,3 +1,6 @@
+use card::Card;
+use card::Suit;
+
 use error::Error;
 use error::Result;
 
@@ -19,6 +22,12 @@ pub enum Rank {
     Queen,
     King,
     Ace,
+}
+
+impl Rank {
+    pub fn of(self, suit: Suit) -> Card {
+        Card::new(suit, self)
+    }
 }
 
 impl fmt::Display for Rank {

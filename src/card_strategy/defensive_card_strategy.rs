@@ -89,3 +89,71 @@ impl CardStrategy for DefensiveCardStrategy {
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use player::PlayerName;
+    use card::Card;
+    use card::Rank::*;
+    use card::Suit::*;
+    use game_status::GameStatus;
+    use game_status::dto::GameStatusDto;
+    use card_strategy::CardStrategy;
+
+    use try_from::TryFrom;
+    use error::Error;
+
+    extern crate serde;
+    extern crate serde_json;
+
+    use std::fs::File;
+    use std::io::Read;
+
+    fn open_scenario(name: &str) -> GameStatus {
+        let file_name = format!("samples/scenarios/{}.json", name);
+        let mut game_status_file = File::open(file_name).unwrap();
+        let mut game_status_string = String::new();
+        game_status_file.read_to_string(&mut game_status_string).unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        GameStatus::try_from(game_status_dto).unwrap()
+    }
+
+    fn should_play(name: &str, expected_card: Card) {
+        let player_name = PlayerName::new("Derek Williams");
+        let game_status = open_scenario(name);
+        let card = DefensiveCardStrategy.play_card(&game_status, &player_name).clone();
+        assert_eq!(expected_card, card);
+    }
+
+    #[test]
+    fn normal_1() {
+        should_play("normal 1", Jack.of(Diamond));
+    }
+
+    #[test]
+    fn normal_2() {
+        should_play("normal 2", King.of(Club));
+    }
+
+    #[test]
+    fn normal_3() {
+        should_play("normal 3", Six.of(Spade));
+    }
+
+    #[test]
+    fn should_play_heart() {
+        should_play("should play heart", Seven.of(Heart));
+    }
+
+    #[test]
+    fn should_play_high_rank_1() {
+        should_play("should play high rank 1", King.of(Diamond));
+    }
+
+    #[test]
+    fn should_play_high_rank_2() {
+        should_play("should play high rank 2", Jack.of(Spade));
+    }
+
+}

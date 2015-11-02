@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_variables)]
 
+#![feature(dir_builder)]
 #![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
 #![plugin(serde_macros)]

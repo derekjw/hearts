@@ -18,8 +18,11 @@ pub struct GameStatus {
     pub current_round_state: RoundState,
     pub round_parameters: RoundParameters,
     pub my_game_state: HeartsGameInstanceState,
-    pub my_game_players: BTreeSet<PlayerName>,
+    pub my_game_state_description: String,
+    pub my_game_players: Vec<GameParticipant>,
     pub my_initial_hand: BTreeSet<Card>,
+    pub cards_passed_by_me: BTreeSet<Card>,
+    pub cards_passed_to_me: BTreeSet<Card>,
     pub my_final_hand: BTreeSet<Card>,
     pub my_current_hand: BTreeSet<Card>,
     pub my_game_deals: Vec<Deal>,
@@ -53,6 +56,12 @@ impl FromStr for GameInstanceState {
     }
 }
 
+impl <'a> From<&'a GameInstanceState> for String {
+    fn from(state: &'a GameInstanceState) -> String {
+        format!("{:?}", state)
+    }
+}
+
 #[derive(Debug)]
 pub enum RoundState {
     NotStarted,
@@ -74,6 +83,12 @@ impl FromStr for RoundState {
             "Cancelled" => Ok(RoundState::Cancelled),
             _ => Err(Error::parsing("RoundState", string))
         }
+    }
+}
+
+impl <'a> From<&'a RoundState> for String {
+    fn from(state: &'a RoundState) -> String {
+        format!("{:?}", state)
     }
 }
 
@@ -113,6 +128,22 @@ impl FromStr for HeartsGameInstanceState {
         }
     }
 }
+
+impl <'a> From<&'a HeartsGameInstanceState> for String {
+    fn from(state: &'a HeartsGameInstanceState) -> String {
+        format!("{:?}", state)
+    }
+}
+
+#[derive(Debug)]
+pub struct GameParticipant {
+    team_name: PlayerName,
+    left_participant: PlayerName,
+    number_of_cards_in_hand: u32,
+    has_turn: bool,
+    current_score: i32,
+}
+
 
 #[cfg(test)]
 mod tests {

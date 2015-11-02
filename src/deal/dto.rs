@@ -10,7 +10,7 @@ use error::Result;
 
 use std::str::FromStr;
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DealDto {
     #[serde(rename="DealNumber")]
     deal_number: u32,
@@ -39,7 +39,19 @@ impl TryFrom<DealDto> for Deal {
     }
 }
 
-#[derive(Deserialize, Debug)]
+impl <'a> From<&'a Deal> for DealDto {
+    fn from(deal: &'a Deal) -> DealDto {
+        DealDto {
+            deal_number: deal.deal_number,
+            initiator: deal.initiator.clone(),
+            suit_type: deal.suit.unwrap_or(Suit::Club).into(),
+            deal_cards: deal.deal_cards.iter().map(DealCardDto::from).collect(),
+            deal_winner: deal.deal_winner.clone(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct DealCardDto {
     #[serde(rename="TeamName")]
     team_name: PlayerName,
@@ -54,5 +66,14 @@ impl TryFrom<DealCardDto> for DealCard {
             player_name: dto.team_name.clone(),
             card: try!(Card::try_from(dto.card))
         })
+    }
+}
+
+impl <'a> From<&'a DealCard> for DealCardDto {
+    fn from(deal_card: &'a DealCard) -> DealCardDto {
+        DealCardDto {
+            team_name: deal_card.player_name.clone(),
+            card: CardDto::from(&deal_card.card),
+        }
     }
 }

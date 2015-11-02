@@ -35,6 +35,12 @@ impl From<Suit> for &'static str {
     }
 }
 
+impl From<Suit> for String {
+    fn from(suit: Suit) -> String {
+        Into::<&str>::into(suit).to_owned()
+    }
+}
+
 impl FromStr for Suit {
     type Err = Error;
 

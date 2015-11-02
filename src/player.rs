@@ -6,11 +6,15 @@ use game_status::{
     HeartsGameInstanceState
 };
 use game_status::dto::GameStatusDto;
+use card::dto::CardDto;
 use try_from::TryFrom;
 use error::Error;
 use error::Result;
 
+use std::fs;
+use std::fs::File;
 use std::io::Read;
+use std::io::Write;
 use std::collections::BTreeSet;
 use std::time::Duration;
 use std::thread;
@@ -169,6 +173,7 @@ impl<A: CardStrategy> Player<A> {
         self.display_my_current_hand(game_status);
         let key_passing = format!("Passing - Round {}", game_status.current_round_id);
         if !self.player_activity_tracker.contains(&key_passing) {
+            try!(self.log_game_status(game_status));
             try!(self.do_passing_activity(game_status));
             self.player_activity_tracker.insert(key_passing);
         }
@@ -181,10 +186,26 @@ impl<A: CardStrategy> Player<A> {
             let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
             let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
             if !self.player_activity_tracker.contains(&key_dealing) {
+                try!(self.log_game_status(game_status));
                 try!(self.do_dealing_activity(game_status));
                 self.player_activity_tracker.insert(key_dealing);
             }
         }
+        Ok(())
+    }
+
+    fn log_game_status(&self, game_status: &GameStatus) -> Result<()> {
+        let ref game_id = game_status.current_game_id;
+        let round_id = game_status.current_round_id;
+        let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
+        let dir_name = format!("game_log/{}", game_id);
+        try!(fs::DirBuilder::new().recursive(true).create(&dir_name));
+        let file_name = format!("{}/{}-{}.json", dir_name, round_id, deal_number);
+        let mut file = try!(File::create(file_name));
+        let dto = GameStatusDto::from(game_status);
+        let string = try!(serde_json::to_string_pretty(&dto));
+        try!(file.write(&string.into_bytes()));
+        try!(file.flush());
         Ok(())
     }
 
@@ -211,8 +232,9 @@ impl<A: CardStrategy> Player<A> {
         let number_of_cards_to_be_passed = game_status.round_parameters.number_of_cards_to_be_passed;
         info!("{} cards need to be passed to the right.", number_of_cards_to_be_passed);
         let cards_to_pass = self.card_strategy.pass_cards(game_status);
+        let cards_to_pass_dto = cards_to_pass.iter().map(|&card| card.into()).collect::<Vec<CardDto>>();
 
-        let serialized_cards_to_pass = try!(serde_json::to_string(&cards_to_pass));
+        let serialized_cards_to_pass = try!(serde_json::to_string(&cards_to_pass_dto));
 
         self.client
             .post(&format!("{}/passcards", self.base_url))
@@ -234,8 +256,9 @@ impl<A: CardStrategy> Player<A> {
 
     fn do_dealing_activity(&mut self, game_status: &GameStatus) -> Result<()> {
         let card_to_deal = self.card_strategy.play_card(game_status, &self.player_name);
+        let card_to_deal_dto: CardDto = card_to_deal.into();
 
-        let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal));
+        let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal_dto));
 
         self.client
             .post(&format!("{}/playcard", self.base_url))

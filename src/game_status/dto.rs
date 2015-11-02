@@ -3,6 +3,7 @@ use game_status::GameStatus;
 use game_status::GameInstanceState;
 use game_status::RoundState;
 use game_status::HeartsGameInstanceState;
+use game_status::GameParticipant;
 
 use card::Card;
 use card::dto::CardDto;
@@ -16,7 +17,7 @@ use error::Result;
 
 use std::str::FromStr;
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GameStatusDto {
     #[serde(rename="CurrentGameId")]
     current_game_id: String,
@@ -67,8 +68,11 @@ impl TryFrom<GameStatusDto> for GameStatus {
             current_round_state: try!(RoundState::from_str(&dto.current_round_state)),
             round_parameters: try!(RoundParameters::try_from(dto.round_parameters)),
             my_game_state: try!(HeartsGameInstanceState::from_str(&dto.my_game_state)),
-            my_game_players: dto.my_game_participants.into_iter().map(|participant| participant.team_name).collect(),
+            my_game_state_description: dto.my_game_state_description,
+            my_game_players: dto.my_game_participants.into_iter().map(GameParticipant::from).collect(),
             my_initial_hand: try!(dto.my_initial_hand.into_iter().map(Card::try_from).collect()),
+            cards_passed_by_me: try!(dto.cards_passed_by_me.into_iter().map(Card::try_from).collect()),
+            cards_passed_to_me: try!(dto.cards_passed_to_me.into_iter().map(Card::try_from).collect()),
             my_final_hand: try!(dto.my_final_hand.into_iter().map(Card::try_from).collect()),
             my_current_hand: try!(dto.my_current_hand.into_iter().map(Card::try_from).collect()),
             my_game_deals: try!(dto.my_game_deals.into_iter().map(Deal::try_from).collect()),
@@ -78,7 +82,30 @@ impl TryFrom<GameStatusDto> for GameStatus {
     }
 }
 
-#[derive(Deserialize, Debug, Default)]
+impl <'a> From<&'a GameStatus> for GameStatusDto {
+    fn from(game_status: &'a GameStatus) -> GameStatusDto {
+        GameStatusDto {
+            current_game_id: game_status.current_game_id.clone(),
+            current_game_state: String::from(&game_status.current_game_state),
+            current_round_id: game_status.current_round_id,
+            current_round_state: String::from(&game_status.current_round_state),
+            round_parameters: RoundParametersDto::from(&game_status.round_parameters),
+            my_game_state: String::from(&game_status.my_game_state),
+            my_game_state_description: game_status.my_game_state_description.clone(),
+            my_game_participants: game_status.my_game_players.iter().map(GameParticipantDto::from).collect(),
+            my_initial_hand: game_status.my_initial_hand.iter().map(CardDto::from).collect(),
+            cards_passed_by_me: game_status.cards_passed_by_me.iter().map(CardDto::from).collect(),
+            cards_passed_to_me: game_status.cards_passed_to_me.iter().map(CardDto::from).collect(),
+            my_final_hand: game_status.my_final_hand.iter().map(CardDto::from).collect(),
+            my_current_hand: game_status.my_current_hand.iter().map(CardDto::from).collect(),
+            my_game_deals: game_status.my_game_deals.iter().map(DealDto::from).collect(),
+            my_in_progress_deal: game_status.my_in_progress_deal.as_ref().map(DealDto::from),
+            is_my_turn: game_status.is_my_turn,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct RoundParametersDto {
     #[serde(rename="RoundId")]
     round_id: u32,
@@ -111,12 +138,26 @@ impl TryFrom<RoundParametersDto> for RoundParameters {
     }
 }
 
-#[derive(Deserialize, Debug)]
+impl <'a> From<&'a RoundParameters> for RoundParametersDto {
+    fn from(entity: &'a RoundParameters) -> RoundParametersDto {
+        RoundParametersDto {
+            round_id: entity.round_id,
+            initiation_phase_in_seconds: entity.initiation_phase_in_seconds,
+            passing_phase_in_seconds: entity.passing_phase_in_seconds,
+            dealing_phase_in_seconds: entity.dealing_phase_in_seconds,
+            finishing_phase_in_seconds: entity.finishing_phase_in_seconds,
+            number_of_cards_to_be_passed: entity.number_of_cards_to_be_passed,
+            card_points: entity.card_points.iter().map(|kv| CardPointsDto { card: kv.0.into(), points: kv.1.clone() }).collect(),
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CardPointsDto {
     #[serde(rename="Card")]
-    card: CardDto,
+    pub card: CardDto,
     #[serde(rename="Point")]
-    points: i32,
+    pub points: i32,
 }
 
 impl TryFrom<CardPointsDto> for (Card, i32) {
@@ -127,7 +168,7 @@ impl TryFrom<CardPointsDto> for (Card, i32) {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GameParticipantDto {
     #[serde(rename="TeamName")]
     team_name: PlayerName,
@@ -139,4 +180,28 @@ pub struct GameParticipantDto {
     has_turn: bool,
     #[serde(rename="CurrentScore")]
     current_score: i32,
+}
+
+impl From<GameParticipantDto> for GameParticipant {
+    fn from(dto: GameParticipantDto) -> GameParticipant {
+        GameParticipant {
+            team_name: dto.team_name,
+            left_participant: dto.left_participant,
+            number_of_cards_in_hand: dto.number_of_cards_in_hand,
+            has_turn: dto.has_turn,
+            current_score: dto.current_score,
+        }
+    }
+}
+
+impl <'a> From<&'a GameParticipant> for GameParticipantDto {
+    fn from(entity: &'a GameParticipant) -> GameParticipantDto {
+        GameParticipantDto {
+            team_name: entity.team_name.clone(),
+            left_participant: entity.left_participant.clone(),
+            number_of_cards_in_hand: entity.number_of_cards_in_hand,
+            has_turn: entity.has_turn,
+            current_score: entity.current_score,
+        }
+    }
 }

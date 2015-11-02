@@ -82,6 +82,12 @@ impl From<Rank> for &'static str {
     }
 }
 
+impl From<Rank> for String {
+    fn from(rank: Rank) -> String {
+        Into::<&str>::into(rank).to_owned()
+    }
+}
+
 impl FromStr for Rank {
     type Err = Error;
 

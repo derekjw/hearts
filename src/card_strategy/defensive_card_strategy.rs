@@ -1,6 +1,8 @@
 use card_strategy::CardStrategy;
 
 use card::Card;
+use card::Suit;
+use card::Rank;
 use game_status::GameStatus;
 use player::PlayerName;
 
@@ -15,12 +17,19 @@ pub struct DefensiveCardStrategy;
     If going to win a deal, do so with highest ranking card.
 */
 impl DefensiveCardStrategy {
-    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
+    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32, i32, i32, i32) {
+        let potential_points = Self::potential_points(card, game_status);
+        let definite_points = if Self::will_win_deal(card, game_status) {
+            potential_points
+        } else {
+            0
+        };
+        let later_potential_points = 0 - Self::later_potential_points(card, game_status);
         let card_penalty_to_me = Self::card_penalty_to_me(card, game_status);
         let card_penalty = 0 - Self::card_penalty(card, game_status);
         let trouble = Self::trouble_score(card, game_status);
         let card_rank = 0 - (u32::from(card.rank) as i32);
-        (card_penalty_to_me, card_penalty, trouble, card_rank)
+        (definite_points, potential_points, later_potential_points, card_penalty_to_me, card_penalty, trouble, card_rank)
     }
 
     fn card_penalty(card: &Card, game_status: &GameStatus) -> i32 {
@@ -43,7 +52,11 @@ impl DefensiveCardStrategy {
             if Self::card_penalty_to_me(card, game_status) < 0 {
                 0 - trouble
             } else {
-                trouble
+                if Self::will_win_deal(card, game_status) {
+                    u32::from(Rank::Ace) as i32
+                } else {
+                    trouble
+                }
             }
         } else {
             0
@@ -60,23 +73,109 @@ impl DefensiveCardStrategy {
                     .map(|winning_card| card.suit == suit && card.rank > winning_card.rank))).unwrap_or(true)
     }
 
+    fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
+        Self::can_win_deal(card, game_status) && (Self::plays_left(game_status).len() == 0 ||
+            Self::deal_suit(game_status)
+                .and_then(|suit| Self::remaining_cards(game_status).iter()
+                    .filter(|card| card.suit == *suit)
+                    .max()
+                    .map(|winning_card| card.rank > winning_card.rank)).unwrap_or(true))
+    }
+
+    fn deal_suit(game_status: &GameStatus) -> Option<&Suit> {
+        game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit.as_ref())
+    }
+
+    fn plays_left(game_status: &GameStatus) -> BTreeSet<&PlayerName> {
+        let mut players: BTreeSet<&PlayerName> = game_status.my_game_players.iter()
+            .filter(|player| !player.has_turn)
+            .map(|player| &player.team_name)
+            .collect();
+
+        if let &Some(ref deal) = &game_status.my_in_progress_deal {
+            for deal_card in &deal.deal_cards {
+                players.remove(&deal_card.player_name);
+            }
+        }
+
+        players
+    }
+
     fn remaining_cards(game_status: &GameStatus) -> BTreeSet<Card> {
         let mut cards = Card::all();
+
         for deal in &game_status.my_game_deals {
             for deal_card in &deal.deal_cards {
                 cards.remove(&deal_card.card);
             }
         }
+
         if let &Some(ref deal) = &game_status.my_in_progress_deal {
             for deal_card in &deal.deal_cards {
                 cards.remove(&deal_card.card);
             }
         }
+
         for card in &game_status.my_current_hand {
             cards.remove(&card);
         }
+
         cards
     }
+
+    fn dealt_cards(game_status: &GameStatus) -> BTreeSet<Card> {
+        game_status.my_in_progress_deal.as_ref()
+            .map(|deal| deal.deal_cards.iter().map(|deal_card| deal_card.card).collect())
+            .unwrap_or_default()
+    }
+
+    fn potential_points(card: &Card, game_status: &GameStatus) -> i32 {
+        if Self::can_win_deal(card, game_status) {
+            let mut cards = Self::remaining_cards(game_status);
+            cards.extend(Self::dealt_cards(game_status));
+            let cards = cards;
+
+            let suit_points: i32 = cards.iter()
+                .filter(|other| other.suit == card.suit)
+                .filter(|other| other.rank < card.rank)
+                .map(|other| Self::card_penalty(other, game_status))
+                .sum();
+
+            let other_points: i32 = cards.iter()
+                .filter(|other| other.suit != card.suit)
+                .map(|other| Self::card_penalty(other, game_status))
+                .sum();
+
+            suit_points + ((Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32)
+        } else {
+            0
+        }
+    }
+
+    fn later_potential_points(card: &Card, game_status: &GameStatus) -> i32 {
+        let cards = Self::remaining_cards(game_status);
+
+        let suit_points: i32 = cards.iter()
+            .filter(|other| other.suit == card.suit)
+            .filter(|other| other.rank < card.rank)
+            .map(|other| Self::card_penalty(other, game_status))
+            .sum();
+
+        let other_points: i32 = cards.iter()
+            .filter(|other| other.suit != card.suit)
+            .map(|other| Self::card_penalty(other, game_status))
+            .sum();
+
+        suit_points + ((Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32)
+    }
+
+    fn chance_of_later_win(card: &Card, game_status: &GameStatus) -> f32 {
+        let cards = Self::remaining_cards(game_status);
+        let suit_cards = cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
+        let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
+        (will_win_count as f32) / (suit_cards.len() as f32)
+    }
+
 
 
 }
@@ -101,10 +200,13 @@ impl CardStrategy for DefensiveCardStrategy {
             valid_cards.extend(&game_status.my_current_hand);
         }
 
-        valid_cards.into_iter()
+        let evaluation = valid_cards.into_iter()
             .map(|card| ((Self::score_card(card, game_status), card), card))
-            .collect::<BTreeMap<((i32, i32, i32, i32), &Card), &Card>>()
-            .values()
+            .collect::<BTreeMap<_,&Card>>();
+
+        // println!("Evaluation: {:?}", evaluation);
+
+        evaluation.values()
             .next()
             .expect("No valid cards to play!")
     }
@@ -163,7 +265,7 @@ mod tests {
     }
 
     #[test]
-    fn should_play_heart_1() { // Opening card should not try to win
+    fn should_play_heart_1() {
         should_play("should play heart 1", Seven.of(Heart));
     }
 
@@ -173,18 +275,18 @@ mod tests {
     }
 
     #[test]
-    fn should_play_high_rank_1() { // Should get rid of high rank
+    fn should_play_high_rank_1() {
         should_play("should play high rank 1", King.of(Diamond));
     }
 
     #[test]
-    fn should_play_high_rank_2() { // Should get rid of high risk high rank
+    fn should_play_high_rank_2() {
         should_play("should play high rank 2", Ace.of(Spade));
     }
 
-    #[test]
-    fn should_play_high_rank_3() { // Should get rid of high risk high rank
-        should_play("should play high rank 3", Ace.of(Spade));
-    }
+    // #[test]
+    // fn should_play_high_rank_3() { // Should get rid of high risk high rank
+    //     should_play("should play high rank 3", Ace.of(Spade));
+    // }
 
 }

@@ -137,11 +137,11 @@ impl <'a> From<&'a HeartsGameInstanceState> for String {
 
 #[derive(Debug)]
 pub struct GameParticipant {
-    team_name: PlayerName,
-    left_participant: PlayerName,
-    number_of_cards_in_hand: u32,
-    has_turn: bool,
-    current_score: i32,
+    pub team_name: PlayerName,
+    pub left_participant: PlayerName,
+    pub number_of_cards_in_hand: u32,
+    pub has_turn: bool,
+    pub current_score: i32,
 }
 
 

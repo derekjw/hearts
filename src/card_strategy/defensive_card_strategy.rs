@@ -5,6 +5,7 @@ use game_status::GameStatus;
 use player::PlayerName;
 
 use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 
 #[derive(Debug)]
 pub struct DefensiveCardStrategy;
@@ -58,6 +59,12 @@ impl DefensiveCardStrategy {
                     .max()
                     .map(|winning_card| card.suit == suit && card.rank > winning_card.rank))).unwrap_or(true)
     }
+
+    fn remaining_cards(game_status: &GameStatus) -> BTreeSet<Card> {
+        Card::all()
+    }
+
+
 }
 
 impl CardStrategy for DefensiveCardStrategy {
@@ -142,8 +149,13 @@ mod tests {
     }
 
     #[test]
-    fn should_play_heart() { // Opening card should not try to win
-        should_play("should play heart", Seven.of(Heart));
+    fn should_play_heart_1() { // Opening card should not try to win
+        should_play("should play heart 1", Seven.of(Heart));
+    }
+
+    #[test]
+    fn should_play_heart_2() {
+        should_play("should play heart 2", Four.of(Heart));
     }
 
     #[test]
@@ -154,6 +166,11 @@ mod tests {
     #[test]
     fn should_play_high_rank_2() { // Should get rid of high risk high rank
         should_play("should play high rank 2", Ace.of(Spade));
+    }
+
+    #[test]
+    fn should_play_high_rank_3() { // Should get rid of high risk high rank
+        should_play("should play high rank 3", Ace.of(Spade));
     }
 
 }

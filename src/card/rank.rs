@@ -6,6 +6,7 @@ use error::Result;
 
 use std::str::FromStr;
 use std::fmt;
+use std::collections::BTreeSet;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Rank {
@@ -28,6 +29,12 @@ impl Rank {
     pub fn of(self, suit: Suit) -> Card {
         Card::new(suit, self)
     }
+
+    pub fn all() -> BTreeSet<Rank> {
+        use self::Rank::*;
+        vec!(Two, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace).into_iter().collect()
+    }
+
 }
 
 impl fmt::Display for Rank {

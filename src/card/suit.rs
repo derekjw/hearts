@@ -3,6 +3,7 @@ use error::Result;
 
 use std::str::FromStr;
 use std::fmt;
+use std::collections::BTreeSet;
 
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub enum Suit {
@@ -10,6 +11,13 @@ pub enum Suit {
     Heart,
     Diamond,
     Club,
+}
+
+impl Suit {
+    pub fn all() -> BTreeSet<Suit> {
+        use self::Suit::*;
+        vec!(Spade, Heart, Diamond, Club).into_iter().collect()
+    }
 }
 
 impl fmt::Display for Suit {

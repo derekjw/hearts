@@ -41,16 +41,18 @@ fn main() {
         .args_from_usage(
             "-u --user=<USER> 'Sets the player name'
              -p --password=<PASSWORD> 'Sets the player password'
-             -s --server=<SERVER> 'Sets the hearts server'")
+             -s --server=<SERVER> 'Sets the hearts server'
+             -r --repeat 'After game ends, attempt to join again'")
         .get_matches();
 
     let player_name = PlayerName::new(cli_options.value_of("USER").unwrap());
     let password = Password::new(cli_options.value_of("PASSWORD").unwrap());
     let server = cli_options.value_of("SERVER").unwrap();
+    let repeat = cli_options.is_present("repeat");
 
     info!("Start Game");
 
     // Settings.init();
-    let player = Player::new(player_name, password, server, DefensiveCardStrategy);
+    let player = Player::new(player_name, password, server, DefensiveCardStrategy, repeat);
     player.play();
 }

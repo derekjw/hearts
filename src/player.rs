@@ -81,10 +81,12 @@ pub struct Player<A: CardStrategy> {
     player_activity_tracker: BTreeSet<String>,
     client: Client,
     running: bool,
+    repeat: bool,
+    current_game_id: Option<String>,
 }
 
 impl<A: CardStrategy> Player<A> {
-    pub fn new(player_name: PlayerName, password: Password, hostname: &str, card_strategy: A) -> Player<A> {
+    pub fn new(player_name: PlayerName, password: Password, hostname: &str, card_strategy: A, repeat: bool) -> Player<A> {
         let base_url = format!("http://{}/api/participant", hostname);
         Player {
             player_name: player_name,
@@ -94,16 +96,17 @@ impl<A: CardStrategy> Player<A> {
             player_activity_tracker: BTreeSet::new(),
             client: Client::new(),
             running: false,
+            repeat: repeat,
+            current_game_id: None,
         }
     }
 
     pub fn play(mut self) {
-        self.player_activity_tracker.clear();
         self.check_server_connectivity();
-        self.running = true;
         while self.running {
             self.get_game_status()
                 .and_then(|game_status| {
+                    self.set_current_game_id(&game_status.current_game_id);
                     let state = &game_status.current_game_state;
                     self.update_game_state(state);
                     match *state {
@@ -116,6 +119,13 @@ impl<A: CardStrategy> Player<A> {
                 })
                 .unwrap_or_else(|e| error!("Unexpected failure: {}", e));
             thread::sleep(Duration::new(1, 0));
+        }
+    }
+
+    fn set_current_game_id(&mut self, game_id: &str) {
+        if self.current_game_id.as_ref().map(|current_game_id| current_game_id != game_id).unwrap_or(true) {
+            self.player_activity_tracker.clear();
+            self.current_game_id = Some(game_id.to_owned())
         }
     }
 
@@ -142,7 +152,9 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn on_game_finished(&mut self) -> Result<()> {
-        self.running = false;
+        if !self.repeat {
+            self.running = false;
+        }
         Ok(())
     }
 

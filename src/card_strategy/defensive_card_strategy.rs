@@ -130,11 +130,12 @@ impl DefensiveCardStrategy {
     }
 
     fn potential_points(card: &Card, game_status: &GameStatus) -> i32 {
-        // potential points for this deal should also have a chance modifier
         if Self::can_win_deal(card, game_status) {
-            let mut cards = Self::remaining_cards(game_status);
-            cards.extend(Self::dealt_cards(game_status));
-            let cards = cards;
+            let cards = Self::remaining_cards(game_status);
+
+            let dealt_points: i32 = Self::dealt_cards(game_status).iter()
+                .map(|other| Self::card_penalty(other, game_status))
+                .sum();
 
             let suit_points: i32 = cards.iter()
                 .filter(|other| other.suit == card.suit)
@@ -147,7 +148,10 @@ impl DefensiveCardStrategy {
                 .map(|other| Self::card_penalty(other, game_status))
                 .sum();
 
-            suit_points + ((Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32)
+            let suit_win_points = (Self::chance_of_win(card, game_status) * (suit_points as f32)) as i32;
+            let other_win_points = (Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32;
+
+            dealt_points + suit_win_points + other_win_points
         } else {
             0
         }
@@ -181,6 +185,24 @@ impl DefensiveCardStrategy {
         }
     }
 
+    fn chance_of_win(card: &Card, game_status: &GameStatus) -> f32 {
+        if Self::will_win_deal(card, game_status) {
+            1.0
+        } else {
+            if Self::deal_suit(game_status).map(|suit| suit == &card.suit).unwrap_or(true) && Self::plays_left(game_status).len() > 0 {
+                let cards = Self::remaining_cards(game_status);
+                let suit_cards = cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
+                let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
+                if suit_cards.is_empty() {
+                    1.0
+                } else {
+                    (will_win_count as f32) / (suit_cards.len() as f32)
+                }
+            } else {
+                0.0
+            }
+        }
+    }
 
 
 }

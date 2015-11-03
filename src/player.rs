@@ -173,7 +173,7 @@ impl<A: CardStrategy> Player<A> {
         self.display_my_current_hand(game_status);
         let key_passing = format!("Passing - Round {}", game_status.current_round_id);
         if !self.player_activity_tracker.contains(&key_passing) {
-            try!(self.log_game_status(game_status));
+            try!(self.log_game_status(game_status, 0));
             try!(self.do_passing_activity(game_status));
             self.player_activity_tracker.insert(key_passing);
         }
@@ -186,7 +186,7 @@ impl<A: CardStrategy> Player<A> {
             let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
             let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
             if !self.player_activity_tracker.contains(&key_dealing) {
-                try!(self.log_game_status(game_status));
+                try!(self.log_game_status(game_status, deal_number));
                 try!(self.do_dealing_activity(game_status));
                 self.player_activity_tracker.insert(key_dealing);
             }
@@ -194,10 +194,9 @@ impl<A: CardStrategy> Player<A> {
         Ok(())
     }
 
-    fn log_game_status(&self, game_status: &GameStatus) -> Result<()> {
+    fn log_game_status(&self, game_status: &GameStatus, deal_number: u32) -> Result<()> {
         let ref game_id = game_status.current_game_id;
         let round_id = game_status.current_round_id;
-        let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
         let dir_name = format!("game_log/{}", game_id);
         try!(fs::DirBuilder::new().recursive(true).create(&dir_name));
         let file_name = format!("{}/{:02}-{:02}.json", dir_name, round_id, deal_number);

@@ -130,6 +130,7 @@ impl DefensiveCardStrategy {
     }
 
     fn potential_points(card: &Card, game_status: &GameStatus) -> i32 {
+        // potential points for this deal should also have a chance modifier
         if Self::can_win_deal(card, game_status) {
             let mut cards = Self::remaining_cards(game_status);
             cards.extend(Self::dealt_cards(game_status));

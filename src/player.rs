@@ -102,6 +102,7 @@ impl<A: CardStrategy> Player<A> {
     }
 
     pub fn play(mut self) {
+        self.running = true;
         self.check_server_connectivity();
         while self.running {
             self.get_game_status()

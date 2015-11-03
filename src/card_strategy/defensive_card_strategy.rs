@@ -183,11 +183,13 @@ impl DefensiveCardStrategy {
 impl CardStrategy for DefensiveCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
-        // Need to order cards by potential to win lowest penalty hands
-        // make sure high risk cards are passed, including those that will win high risk cards (Queen of Spades)
-        let mut initial_hand = game_status.my_initial_hand.iter().collect::<Vec<&Card>>();
-        initial_hand.reverse();
-        initial_hand.into_iter().take(3).collect()
+        game_status.my_initial_hand.iter()
+            .map(|card| ((0 - Self::later_potential_points(card, game_status), card), card))
+            .collect::<BTreeMap<_, &Card>>()
+            .into_iter()
+            .map(|kv| kv.1)
+            .take(3)
+            .collect()
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {

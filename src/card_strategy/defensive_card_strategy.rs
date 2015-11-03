@@ -173,7 +173,11 @@ impl DefensiveCardStrategy {
         let cards = Self::remaining_cards(game_status);
         let suit_cards = cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
         let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
-        (will_win_count as f32) / (suit_cards.len() as f32)
+        if suit_cards.is_empty() {
+            1.0
+        } else {
+            (will_win_count as f32) / (suit_cards.len() as f32)
+        }
     }
 
 
@@ -290,5 +294,11 @@ mod tests {
     // fn should_play_high_rank_3() { // Should get rid of high risk high rank
     //     should_play("should play high rank 3", Ace.of(Spade));
     // }
+
+    #[test]
+    fn should_not_crash_during_card_play() {
+        should_play("crashed during card play", Ten.of(Heart));
+    }
+
 
 }

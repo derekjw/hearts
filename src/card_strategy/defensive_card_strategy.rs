@@ -30,7 +30,7 @@ impl DefensiveCardStrategy {
     }
 
     fn card_penalty_to_me(card: &Card, game_status: &GameStatus) -> i32 {
-        if Self::will_win_deal(card, game_status) {
+        if Self::can_win_deal(card, game_status) {
             Self::card_penalty(card, game_status)
         } else {
             0
@@ -38,7 +38,7 @@ impl DefensiveCardStrategy {
     }
 
     fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
-        if Self::will_win_deal(card, game_status) {
+        if Self::can_win_deal(card, game_status) {
             let trouble = u32::from(card.rank) as i32;
             if Self::card_penalty_to_me(card, game_status) < 0 {
                 0 - trouble
@@ -50,7 +50,7 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
+    fn can_win_deal(card: &Card, game_status: &GameStatus) -> bool {
         game_status.my_in_progress_deal.as_ref().and_then(|deal|
             deal.suit.and_then(|suit|
                 deal.deal_cards.iter()
@@ -61,7 +61,21 @@ impl DefensiveCardStrategy {
     }
 
     fn remaining_cards(game_status: &GameStatus) -> BTreeSet<Card> {
-        Card::all()
+        let mut cards = Card::all();
+        for deal in &game_status.my_game_deals {
+            for deal_card in &deal.deal_cards {
+                cards.remove(&deal_card.card);
+            }
+        }
+        if let &Some(ref deal) = &game_status.my_in_progress_deal {
+            for deal_card in &deal.deal_cards {
+                cards.remove(&deal_card.card);
+            }
+        }
+        for card in &game_status.my_current_hand {
+            cards.remove(&card);
+        }
+        cards
     }
 
 

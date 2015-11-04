@@ -129,6 +129,7 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
+    // FIXME: needs to take into account card that will be played!
     fn potential_points(card: &Card, game_status: &GameStatus) -> i32 {
         if Self::can_win_deal(card, game_status) {
             let cards = Self::remaining_cards(game_status);

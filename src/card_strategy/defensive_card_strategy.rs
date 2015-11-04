@@ -150,9 +150,12 @@ impl DefensiveCardStrategy {
                 .sum();
 
             let number_of_suit = cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
+            let number_dealt = Self::dealt_cards(game_status).len() as u32;
+
+            let safe_target = 13 - (number_dealt * 2);
 
             let suit_win_points = (Self::chance_of_win(card, game_status) * (suit_points as f32)) as i32;
-            let other_win_points = if number_of_suit < 7 {
+            let other_win_points = if number_of_suit < safe_target {
                 (Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32
             } else {
                 0

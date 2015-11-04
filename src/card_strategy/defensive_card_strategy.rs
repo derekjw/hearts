@@ -323,5 +323,14 @@ mod tests {
         should_play("crashed during card play", Ten.of(Heart));
     }
 
+    #[test]
+    fn should_play_low_negative_points_card_1() {
+        should_play("should play low negative points card 1", Two.of(Diamond));
+    }
+
+    #[test]
+    fn should_play_high_negative_points_card_1() {
+        should_play("should play high negative points card 1", Ace.of(Diamond));
+    }
 
 }

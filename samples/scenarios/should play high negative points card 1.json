@@ -1,0 +1,639 @@
+{
+  "CurrentGameId": "e57712c15229426eb7b2d51de3cea767",
+  "CurrentGameState": "Running",
+  "CurrentRoundId": 3,
+  "CurrentRoundState": "Running",
+  "RoundParameters": {
+    "RoundId": 3,
+    "InitiationPhaseInSeconds": 5,
+    "PassingPhaseInSeconds": 15,
+    "DealingPhaseInSeconds": 5,
+    "FinishingPhaseInSeconds": 5,
+    "NumberOfCardsTobePassed": 3,
+    "CardPoints": [
+      {
+        "Card": {
+          "Suit": "Spade",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 13
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 2,
+          "Symbol": "2"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 3,
+          "Symbol": "3"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 4,
+          "Symbol": "4"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 5,
+          "Symbol": "5"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 6,
+          "Symbol": "6"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 7,
+          "Symbol": "7"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 8,
+          "Symbol": "8"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 9,
+          "Symbol": "9"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 10,
+          "Symbol": "10"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 11,
+          "Symbol": "J"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 13,
+          "Symbol": "K"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 14,
+          "Symbol": "A"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 2,
+          "Symbol": "2"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 3,
+          "Symbol": "3"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 4,
+          "Symbol": "4"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 5,
+          "Symbol": "5"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 6,
+          "Symbol": "6"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 7,
+          "Symbol": "7"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 8,
+          "Symbol": "8"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 9,
+          "Symbol": "9"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 10,
+          "Symbol": "10"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 11,
+          "Symbol": "J"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 13,
+          "Symbol": "K"
+        },
+        "Point": -1
+      },
+      {
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 14,
+          "Symbol": "A"
+        },
+        "Point": -1
+      }
+    ]
+  },
+  "MyGameState": "Dealing",
+  "MyGameStateDescription": "Playing",
+  "MyGameParticipants": [
+    {
+      "TeamName": "Derek Williams",
+      "LeftParticipant": "MattLangmead",
+      "NumberOfCardsInHand": 10,
+      "HasTurn": true,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "MattLangmead",
+      "LeftParticipant": "HeartWinners",
+      "NumberOfCardsInHand": 9,
+      "HasTurn": false,
+      "CurrentScore": 5
+    },
+    {
+      "TeamName": "HeartWinners",
+      "LeftParticipant": "Dummy-0",
+      "NumberOfCardsInHand": 9,
+      "HasTurn": false,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "Dummy-0",
+      "LeftParticipant": "Derek Williams",
+      "NumberOfCardsInHand": 9,
+      "HasTurn": false,
+      "CurrentScore": 0
+    }
+  ],
+  "MyInitialHand": [
+    {
+      "Suit": "Spade",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 6,
+      "Symbol": "6"
+    },
+    {
+      "Suit": "Club",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Club",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Club",
+      "Number": 8,
+      "Symbol": "8"
+    },
+    {
+      "Suit": "Club",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "CardsPassedByMe": [
+    {
+      "Suit": "Spade",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 12,
+      "Symbol": "Q"
+    }
+  ],
+  "CardsPassedToMe": [
+    {
+      "Suit": "Spade",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    }
+  ],
+  "MyFinalHand": [
+    {
+      "Suit": "Spade",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 6,
+      "Symbol": "6"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Club",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Club",
+      "Number": 8,
+      "Symbol": "8"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Club",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "MyCurrentHand": [
+    {
+      "Suit": "Spade",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 5,
+      "Symbol": "5"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 6,
+      "Symbol": "6"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Club",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "MyGameDeals": [
+    {
+      "DealNumber": 1,
+      "Initiator": "Dummy-0",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Club",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        },
+        {
+          "TeamName": "MattLangmead",
+          "Card": {
+            "Suit": "Club",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        },
+        {
+          "TeamName": "HeartWinners",
+          "Card": {
+            "Suit": "Club",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        }
+      ],
+      "DealWinner": "HeartWinners"
+    },
+    {
+      "DealNumber": 2,
+      "Initiator": "HeartWinners",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "HeartWinners",
+          "Card": {
+            "Suit": "Club",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Club",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        },
+        {
+          "TeamName": "MattLangmead",
+          "Card": {
+            "Suit": "Club",
+            "Number": 9,
+            "Symbol": "9"
+          }
+        }
+      ],
+      "DealWinner": "MattLangmead"
+    },
+    {
+      "DealNumber": 3,
+      "Initiator": "MattLangmead",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "MattLangmead",
+          "Card": {
+            "Suit": "Club",
+            "Number": 12,
+            "Symbol": "Q"
+          }
+        },
+        {
+          "TeamName": "HeartWinners",
+          "Card": {
+            "Suit": "Club",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 8,
+            "Symbol": "8"
+          }
+        }
+      ],
+      "DealWinner": "MattLangmead"
+    }
+  ],
+  "MyInProgressDeal": {
+    "DealNumber": 4,
+    "Initiator": "MattLangmead",
+    "SuitType": "Diamond",
+    "DealCards": [
+      {
+        "TeamName": "MattLangmead",
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 12,
+          "Symbol": "Q"
+        }
+      },
+      {
+        "TeamName": "HeartWinners",
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 10,
+          "Symbol": "10"
+        }
+      },
+      {
+        "TeamName": "Dummy-0",
+        "Card": {
+          "Suit": "Diamond",
+          "Number": 3,
+          "Symbol": "3"
+        }
+      }
+    ],
+    "DealWinner": null
+  },
+  "IsMyTurn": true
+}

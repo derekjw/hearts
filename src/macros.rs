@@ -18,16 +18,13 @@ macro_rules! string_enum {
 
         impl From<$name> for &'static str {
             fn from(entity: $name) -> &'static str {
-                use self::$name::*;
-                match entity {
-                    $($value => stringify!($value),)*
-                }
+                From::from(&entity)
             }
         }
 
         impl From<$name> for String {
             fn from(entity: $name) -> String {
-                Into::<&str>::into(entity).to_owned()
+                From::from(&entity)
             }
         }
 

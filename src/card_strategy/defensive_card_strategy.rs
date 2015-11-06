@@ -137,7 +137,7 @@ impl DefensiveCardStrategy {
                 0
             };
 
-            let other_win_points = if number_of_suit < safe_target {
+            let other_win_points = if number_of_suit < safe_target && number_dealt < 3 {
                 (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32
             } else {
                 0
@@ -237,7 +237,7 @@ impl CardStrategy for DefensiveCardStrategy {
             .map(|card| ((Self::score_card(card, game_status), card), card))
             .collect::<BTreeMap<_,&Card>>();
 
-        // println!("Remaining: {}", Self::remaining_cards(game_status).iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+        // println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
         // for item in &evaluation {
         //     println!("{}: {:?}", item.1, (item.0).0);
         // }
@@ -338,6 +338,11 @@ mod tests {
     #[test]
     fn should_play_high_negative_points_card_1() {
         should_play("should play high negative points card 1", Ace.of(Diamond));
+    }
+
+    #[test]
+    fn should_try_to_win_deal_1() {
+        should_play("should try to win deal 1", Ace.of(Club));
     }
 
 }

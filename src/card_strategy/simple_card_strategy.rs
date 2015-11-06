@@ -4,6 +4,7 @@ use card::Card;
 use game_status::GameStatus;
 use player::PlayerName;
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct SimpleCardStrategy;
 

@@ -2,7 +2,6 @@ use card_strategy::CardStrategy;
 
 use card::Card;
 use card::Suit;
-use card::Rank;
 use deal::Deal;
 use game_status::GameStatus;
 use game_status::RoundParameters;
@@ -19,7 +18,7 @@ pub struct DefensiveCardStrategy;
     Play 2 of clubs if in hand.
 */
 impl DefensiveCardStrategy {
-    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32, i32, i32, i32) {
+    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
         let remaining_cards = game_status.unplayed_cards();
 
         let potential_points = Self::potential_points(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards, &game_status.round_parameters);
@@ -29,36 +28,8 @@ impl DefensiveCardStrategy {
             0
         };
         let later_potential_points = 0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
-        let card_penalty_to_me = Self::card_penalty_to_me(card, &game_status.my_in_progress_deal, &game_status.round_parameters);
-        let card_penalty = 0 - game_status.round_parameters.points(card);
-        let trouble = Self::trouble_score(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards, &game_status.round_parameters);
         let card_rank = 0 - (u32::from(card.rank) as i32);
-        (definite_points, potential_points, later_potential_points, card_penalty_to_me, card_penalty, trouble, card_rank)
-    }
-
-    fn card_penalty_to_me(card: &Card, in_progress_deal: &Option<Deal>, round_parameters: &RoundParameters) -> i32 {
-        if Self::can_win_deal(card, in_progress_deal) {
-            round_parameters.points(card)
-        } else {
-            0
-        }
-    }
-
-    fn trouble_score(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
-        if Self::can_win_deal(card, in_progress_deal) {
-            let trouble = u32::from(card.rank) as i32;
-            if Self::card_penalty_to_me(card, in_progress_deal, round_parameters) < 0 {
-                0 - trouble
-            } else {
-                if Self::will_win_deal(card, game_players, in_progress_deal, remaining_cards) {
-                    u32::from(Rank::Ace) as i32
-                } else {
-                    trouble
-                }
-            }
-        } else {
-            0
-        }
+        (definite_points, potential_points, later_potential_points, card_rank)
     }
 
     fn can_win_deal(card: &Card, in_progress_deal: &Option<Deal>) -> bool {
@@ -99,9 +70,9 @@ impl DefensiveCardStrategy {
         players
     }
 
-    fn dealt_cards(in_progress_deal: &Option<Deal>) -> BTreeSet<Card> {
+    fn dealt_cards(in_progress_deal: &Option<Deal>) -> BTreeSet<&Card> {
         in_progress_deal.as_ref()
-            .map(|deal| deal.deal_cards.iter().map(|deal_card| deal_card.card).collect())
+            .map(|deal| deal.deal_cards.iter().map(|deal_card| &deal_card.card).collect())
             .unwrap_or_default()
     }
 

@@ -51,11 +51,6 @@ impl Password {
     where A: Into<String> {
         Password(value.into())
     }
-
-    fn clone_string(&self) -> String {
-        let &Password(ref string) = self;
-        string.clone()
-    }
 }
 
 impl From<Password> for String {

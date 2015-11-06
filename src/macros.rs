@@ -2,6 +2,14 @@
 
 macro_rules! string_enum {
     ($name:ident { $($value:ident,)* }) => {
+        string_enum! {
+            $name {
+                $($value => $value,)*
+            }
+        }
+    };
+
+    ($name:ident { $($value:ident => $string:tt,)* }) => {
 
         #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
         pub enum $name {
@@ -32,7 +40,7 @@ macro_rules! string_enum {
             fn from(entity: &'a $name) -> &'static str {
                 use self::$name::*;
                 match *entity {
-                    $($value => stringify!($value),)*
+                    $($value => stringify!($string),)*
                 }
             }
         }
@@ -49,11 +57,11 @@ macro_rules! string_enum {
             fn from_str(string: &str) -> ::error::Result<$name> {
                 use self::$name::*;
                 match string {
-                    $(stringify!($value) => Ok($value),)*
+                    $(stringify!($string) => Ok($value),)*
                     _ => Err(::error::Error::parsing(stringify!($name), string))
                 }
             }
         }
 
-    }
+    };
 }

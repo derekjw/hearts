@@ -30,6 +30,31 @@ pub struct GameStatus {
     pub is_my_turn: bool,
 }
 
+impl GameStatus {
+    pub fn unplayed_cards(&self) -> BTreeSet<Card> {
+        let mut cards = Card::all();
+
+        for deal in &self.my_game_deals {
+            for deal_card in &deal.deal_cards {
+                cards.remove(&deal_card.card);
+            }
+        }
+
+        if let &Some(ref deal) = &self.my_in_progress_deal {
+            for deal_card in &deal.deal_cards {
+                cards.remove(&deal_card.card);
+            }
+        }
+
+        for card in &self.my_current_hand {
+            cards.remove(&card);
+        }
+
+        cards
+    }
+
+}
+
 #[derive(Debug)]
 pub enum GameInstanceState {
     NotStarted,
@@ -101,6 +126,14 @@ pub struct RoundParameters {
     pub finishing_phase_in_seconds: u32,
     pub number_of_cards_to_be_passed: u32,
     pub card_points: BTreeMap<Card, i32>
+}
+
+impl RoundParameters {
+    pub fn points(&self, card: &Card) -> i32 {
+        self.card_points.get(card)
+            .map(|penalty| *penalty)
+            .unwrap_or_default()
+    }
 }
 
 #[derive(Debug)]

@@ -3,7 +3,10 @@ use card_strategy::CardStrategy;
 use card::Card;
 use card::Suit;
 use card::Rank;
+use deal::Deal;
 use game_status::GameStatus;
+use game_status::RoundParameters;
+use game_status::GameParticipant;
 use player::PlayerName;
 
 use std::collections::BTreeMap;
@@ -17,41 +20,37 @@ pub struct DefensiveCardStrategy;
 */
 impl DefensiveCardStrategy {
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32, i32, i32, i32) {
-        let potential_points = Self::potential_points(card, game_status);
-        let definite_points = if Self::will_win_deal(card, game_status) {
+        let remaining_cards = game_status.unplayed_cards();
+
+        let potential_points = Self::potential_points(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards, &game_status.round_parameters);
+        let definite_points = if Self::will_win_deal(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards) {
             potential_points
         } else {
             0
         };
-        let later_potential_points = 0 - Self::later_potential_points(card, game_status);
-        let card_penalty_to_me = Self::card_penalty_to_me(card, game_status);
-        let card_penalty = 0 - Self::card_penalty(card, game_status);
-        let trouble = Self::trouble_score(card, game_status);
+        let later_potential_points = 0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
+        let card_penalty_to_me = Self::card_penalty_to_me(card, &game_status.my_in_progress_deal, &game_status.round_parameters);
+        let card_penalty = 0 - game_status.round_parameters.points(card);
+        let trouble = Self::trouble_score(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards, &game_status.round_parameters);
         let card_rank = 0 - (u32::from(card.rank) as i32);
         (definite_points, potential_points, later_potential_points, card_penalty_to_me, card_penalty, trouble, card_rank)
     }
 
-    fn card_penalty(card: &Card, game_status: &GameStatus) -> i32 {
-        game_status.round_parameters.card_points.get(card)
-            .map(|penalty| *penalty)
-            .unwrap_or_default()
-    }
-
-    fn card_penalty_to_me(card: &Card, game_status: &GameStatus) -> i32 {
-        if Self::can_win_deal(card, game_status) {
-            Self::card_penalty(card, game_status)
+    fn card_penalty_to_me(card: &Card, in_progress_deal: &Option<Deal>, round_parameters: &RoundParameters) -> i32 {
+        if Self::can_win_deal(card, in_progress_deal) {
+            round_parameters.points(card)
         } else {
             0
         }
     }
 
-    fn trouble_score(card: &Card, game_status: &GameStatus) -> i32 {
-        if Self::can_win_deal(card, game_status) {
+    fn trouble_score(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
+        if Self::can_win_deal(card, in_progress_deal) {
             let trouble = u32::from(card.rank) as i32;
-            if Self::card_penalty_to_me(card, game_status) < 0 {
+            if Self::card_penalty_to_me(card, in_progress_deal, round_parameters) < 0 {
                 0 - trouble
             } else {
-                if Self::will_win_deal(card, game_status) {
+                if Self::will_win_deal(card, game_players, in_progress_deal, remaining_cards) {
                     u32::from(Rank::Ace) as i32
                 } else {
                     trouble
@@ -62,8 +61,8 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn can_win_deal(card: &Card, game_status: &GameStatus) -> bool {
-        game_status.my_in_progress_deal.as_ref().and_then(|deal|
+    fn can_win_deal(card: &Card, in_progress_deal: &Option<Deal>) -> bool {
+        in_progress_deal.as_ref().and_then(|deal|
             deal.suit.and_then(|suit|
                 deal.deal_cards.iter()
                     .map(|deal_card| deal_card.card)
@@ -72,26 +71,26 @@ impl DefensiveCardStrategy {
                     .map(|winning_card| card.suit == suit && card.rank > winning_card.rank))).unwrap_or(true)
     }
 
-    fn will_win_deal(card: &Card, game_status: &GameStatus) -> bool {
-        Self::can_win_deal(card, game_status) && (Self::plays_left(game_status).len() == 0 ||
-            Self::deal_suit(game_status)
-                .and_then(|suit| Self::remaining_cards(game_status).iter()
+    fn will_win_deal(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> bool {
+        Self::can_win_deal(card, in_progress_deal) && (Self::plays_left(game_players, in_progress_deal).len() == 0 ||
+            Self::deal_suit(in_progress_deal)
+                .and_then(|suit| remaining_cards.iter()
                     .filter(|card| card.suit == *suit)
                     .max()
                     .map(|winning_card| card.rank > winning_card.rank)).unwrap_or(true))
     }
 
-    fn deal_suit(game_status: &GameStatus) -> Option<&Suit> {
-        game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit.as_ref())
+    fn deal_suit(in_progress_deal: &Option<Deal>) -> Option<&Suit> {
+        in_progress_deal.as_ref().and_then(|deal| deal.suit.as_ref())
     }
 
-    fn plays_left(game_status: &GameStatus) -> BTreeSet<&PlayerName> {
-        let mut players: BTreeSet<&PlayerName> = game_status.my_game_players.iter()
+    fn plays_left<'a>(game_players: &'a Vec<GameParticipant>, in_progress_deal: &Option<Deal>) -> BTreeSet<&'a PlayerName> {
+        let mut players: BTreeSet<&PlayerName> = game_players.iter()
             .filter(|player| !player.has_turn)
             .map(|player| &player.team_name)
             .collect();
 
-        if let &Some(ref deal) = &game_status.my_in_progress_deal {
+        if let &Some(ref deal) = in_progress_deal {
             for deal_card in &deal.deal_cards {
                 players.remove(&deal_card.player_name);
             }
@@ -100,63 +99,46 @@ impl DefensiveCardStrategy {
         players
     }
 
-    fn remaining_cards(game_status: &GameStatus) -> BTreeSet<Card> {
-        let mut cards = Card::all();
-
-        for deal in &game_status.my_game_deals {
-            for deal_card in &deal.deal_cards {
-                cards.remove(&deal_card.card);
-            }
-        }
-
-        if let &Some(ref deal) = &game_status.my_in_progress_deal {
-            for deal_card in &deal.deal_cards {
-                cards.remove(&deal_card.card);
-            }
-        }
-
-        for card in &game_status.my_current_hand {
-            cards.remove(&card);
-        }
-
-        cards
-    }
-
-    fn dealt_cards(game_status: &GameStatus) -> BTreeSet<Card> {
-        game_status.my_in_progress_deal.as_ref()
+    fn dealt_cards(in_progress_deal: &Option<Deal>) -> BTreeSet<Card> {
+        in_progress_deal.as_ref()
             .map(|deal| deal.deal_cards.iter().map(|deal_card| deal_card.card).collect())
             .unwrap_or_default()
     }
 
-    fn potential_points(card: &Card, game_status: &GameStatus) -> i32 {
-        if Self::can_win_deal(card, game_status) {
-            let cards = Self::remaining_cards(game_status);
+    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
+        if Self::can_win_deal(card, in_progress_deal) {
+            let dealt_cards = Self::dealt_cards(in_progress_deal);
 
-            let card_points = Self::card_penalty(card, game_status);
+            let card_points = round_parameters.points(card);
 
-            let dealt_points: i32 = Self::dealt_cards(game_status).iter()
-                .map(|other| Self::card_penalty(other, game_status))
+            let dealt_points: i32 = dealt_cards.iter()
+                .map(|other| round_parameters.points(other))
                 .sum();
 
-            let suit_points: i32 = cards.iter()
+            let suit_points: i32 = remaining_cards.iter()
                 .filter(|other| other.suit == card.suit)
                 .filter(|other| other.rank < card.rank)
-                .map(|other| Self::card_penalty(other, game_status))
+                .map(|other| round_parameters.points(other))
                 .sum();
 
-            let other_points: i32 = cards.iter()
+            let other_points: i32 = remaining_cards.iter()
                 .filter(|other| other.suit != card.suit)
-                .map(|other| Self::card_penalty(other, game_status))
+                .map(|other| round_parameters.points(other))
                 .sum();
 
-            let number_of_suit = cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
-            let number_dealt = Self::dealt_cards(game_status).len() as u32;
+            let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
+            let number_dealt = dealt_cards.len() as u32;
 
             let safe_target = 13 - (number_dealt * 2);
 
-            let suit_win_points = (Self::chance_of_win(card, game_status) * (suit_points as f32)) as i32;
+            let suit_win_points = if number_dealt < 3 {
+                (Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * (suit_points as f32)) as i32
+            } else {
+                0
+            };
+
             let other_win_points = if number_of_suit < safe_target {
-                (Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32
+                (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32
             } else {
                 0
             };
@@ -167,30 +149,27 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn later_potential_points(card: &Card, game_status: &GameStatus) -> i32 {
-        let cards = Self::remaining_cards(game_status);
+    fn later_potential_points(card: &Card, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
+        let card_points = round_parameters.points(card);
 
-        let card_points = Self::card_penalty(card, game_status);
-
-        let suit_points: i32 = cards.iter()
+        let suit_points: i32 = remaining_cards.iter()
             .filter(|other| other.suit == card.suit)
             .filter(|other| other.rank < card.rank)
-            .map(|other| Self::card_penalty(other, game_status))
+            .map(|other| round_parameters.points(other))
             .sum();
 
-        let other_points: i32 = cards.iter()
+        let other_points: i32 = remaining_cards.iter()
             .filter(|other| other.suit != card.suit)
-            .map(|other| Self::card_penalty(other, game_status))
+            .map(|other| round_parameters.points(other))
             .sum();
 
-        let other_win_points = (Self::chance_of_later_win(card, game_status) * (other_points as f32)) as i32;
+        let other_win_points = (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32;
 
         card_points + suit_points + other_win_points
     }
 
-    fn chance_of_later_win(card: &Card, game_status: &GameStatus) -> f32 {
-        let cards = Self::remaining_cards(game_status);
-        let suit_cards = cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
+    fn chance_of_later_win(card: &Card, remaining_cards: &BTreeSet<Card>) -> f32 {
+        let suit_cards = remaining_cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
         let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
         if suit_cards.is_empty() {
             1.0
@@ -199,13 +178,12 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn chance_of_win(card: &Card, game_status: &GameStatus) -> f32 {
-        if Self::will_win_deal(card, game_status) {
+    fn chance_of_win(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> f32 {
+        if Self::will_win_deal(card, game_players, in_progress_deal, remaining_cards) {
             1.0
         } else {
-            if Self::deal_suit(game_status).map(|suit| suit == &card.suit).unwrap_or(true) && Self::plays_left(game_status).len() > 0 {
-                let cards = Self::remaining_cards(game_status);
-                let suit_cards = cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
+            if Self::deal_suit(in_progress_deal).map(|suit| suit == &card.suit).unwrap_or(true) && Self::plays_left(game_players, in_progress_deal).len() > 0 {
+                let suit_cards = remaining_cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
                 let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
                 if suit_cards.is_empty() {
                     1.0
@@ -218,19 +196,31 @@ impl DefensiveCardStrategy {
         }
     }
 
+    fn pass_card<'a>(hand: &'a BTreeSet<Card>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> Option<&'a Card> {
+        hand.iter()
+            .filter(|card| !remaining_cards.contains(card))
+            .map(|card| ((0 - Self::later_potential_points(card, &remaining_cards, round_parameters), card), card))
+            .collect::<BTreeMap<_, &Card>>()
+            .into_iter()
+            .map(|kv| kv.1)
+            .next()
+    }
+
 
 }
 
 impl CardStrategy for DefensiveCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
-        game_status.my_initial_hand.iter()
-            .map(|card| ((0 - Self::later_potential_points(card, game_status), card), card))
-            .collect::<BTreeMap<_, &Card>>()
-            .into_iter()
-            .map(|kv| kv.1)
-            .take(3)
-            .collect()
+        let mut remaining_cards = game_status.unplayed_cards();
+
+        let card1 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+        if let Some(card) = card1 { remaining_cards.insert(card.clone()); };
+        let card2 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+        if let Some(card) = card2 { remaining_cards.insert(card.clone()); };
+        let card3 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+
+        vec!(card1, card2, card3).into_iter().filter_map(|card| card).collect()
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {

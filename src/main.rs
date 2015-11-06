@@ -4,6 +4,7 @@
 #![feature(iter_arith)]
 #![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
+
 #![plugin(serde_macros)]
 
 extern crate hyper;
@@ -13,6 +14,9 @@ extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
 extern crate clap;
+
+#[macro_use]
+mod macros;
 
 mod card;
 mod player;

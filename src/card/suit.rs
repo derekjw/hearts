@@ -1,22 +1,11 @@
-use error::Error;
-use error::Result;
-
-use std::str::FromStr;
 use std::fmt;
-use std::collections::BTreeSet;
 
-#[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
-pub enum Suit {
-    Spade,
-    Heart,
-    Diamond,
-    Club,
-}
-
-impl Suit {
-    pub fn all() -> BTreeSet<Suit> {
-        use self::Suit::*;
-        vec!(Spade, Heart, Diamond, Club).into_iter().collect()
+string_enum! {
+    Suit {
+        Spade,
+        Heart,
+        Diamond,
+        Club,
     }
 }
 
@@ -29,36 +18,5 @@ impl fmt::Display for Suit {
             Suit::Club => "\u{2663}",
         };
         write!(f, "{}", suit_str)
-    }
-}
-
-impl From<Suit> for &'static str {
-    fn from(suit: Suit) -> &'static str {
-        match suit {
-            Suit::Heart => "Heart",
-            Suit::Diamond => "Diamond",
-            Suit::Spade => "Spade",
-            Suit::Club => "Club"
-        }
-    }
-}
-
-impl From<Suit> for String {
-    fn from(suit: Suit) -> String {
-        Into::<&str>::into(suit).to_owned()
-    }
-}
-
-impl FromStr for Suit {
-    type Err = Error;
-
-    fn from_str(string: &str) -> Result<Suit> {
-        match string {
-            "Heart" => Ok(Suit::Heart),
-            "Diamond" => Ok(Suit::Diamond),
-            "Spade" => Ok(Suit::Spade),
-            "Club" => Ok(Suit::Club),
-            _ => Err(Error::parsing("Suit", string))
-        }
     }
 }

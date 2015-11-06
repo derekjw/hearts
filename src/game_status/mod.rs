@@ -4,11 +4,8 @@ use card::Card;
 use deal::Deal;
 use player::PlayerName;
 
-use error::Error;
-
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
-use std::str::FromStr;
 
 #[derive(Debug)]
 pub struct GameStatus {
@@ -55,65 +52,24 @@ impl GameStatus {
 
 }
 
-#[derive(Debug)]
-pub enum GameInstanceState {
-    NotStarted,
-    Initiated,
-    Open,
-    Running,
-    Finished,
-    Cancelled,
-}
-
-impl FromStr for GameInstanceState {
-    type Err = Error;
-
-    fn from_str(string: &str) -> Result<GameInstanceState, Error> {
-        match string {
-            "NotStarted" => Ok(GameInstanceState::NotStarted),
-            "Initiated" => Ok(GameInstanceState::Initiated),
-            "Open" => Ok(GameInstanceState::Open),
-            "Running" => Ok(GameInstanceState::Running),
-            "Finished" => Ok(GameInstanceState::Finished),
-            "Cancelled" => Ok(GameInstanceState::Cancelled),
-            _ => Err(Error::parsing("GameInstanceState", string))
-        }
+string_enum! {
+    GameInstanceState {
+        NotStarted,
+        Initiated,
+        Open,
+        Running,
+        Finished,
+        Cancelled,
     }
 }
 
-impl <'a> From<&'a GameInstanceState> for String {
-    fn from(state: &'a GameInstanceState) -> String {
-        format!("{:?}", state)
-    }
-}
-
-#[derive(Debug)]
-pub enum RoundState {
-    NotStarted,
-    Initiated,
-    Running,
-    Finished,
-    Cancelled,
-}
-
-impl FromStr for RoundState {
-    type Err = Error;
-
-    fn from_str(string: &str) -> Result<RoundState, Error> {
-        match string {
-            "NotStarted" => Ok(RoundState::NotStarted),
-            "Initiated" => Ok(RoundState::Initiated),
-            "Running" => Ok(RoundState::Running),
-            "Finished" => Ok(RoundState::Finished),
-            "Cancelled" => Ok(RoundState::Cancelled),
-            _ => Err(Error::parsing("RoundState", string))
-        }
-    }
-}
-
-impl <'a> From<&'a RoundState> for String {
-    fn from(state: &'a RoundState) -> String {
-        format!("{:?}", state)
+string_enum! {
+    RoundState {
+        NotStarted,
+        Initiated,
+        Running,
+        Finished,
+        Cancelled,
     }
 }
 
@@ -136,35 +92,14 @@ impl RoundParameters {
     }
 }
 
-#[derive(Debug)]
-pub enum HeartsGameInstanceState {
-    NotStarted,
-    Initiated,
-    Passing,
-    Dealing,
-    Finished,
-    Cancelled,
-}
-
-impl FromStr for HeartsGameInstanceState {
-    type Err = Error;
-
-    fn from_str(string: &str) -> Result<HeartsGameInstanceState, Error> {
-        match string {
-            "NotStarted" => Ok(HeartsGameInstanceState::NotStarted),
-            "Initiated" => Ok(HeartsGameInstanceState::Initiated),
-            "Passing" => Ok(HeartsGameInstanceState::Passing),
-            "Dealing" => Ok(HeartsGameInstanceState::Dealing),
-            "Finished" => Ok(HeartsGameInstanceState::Finished),
-            "Cancelled" => Ok(HeartsGameInstanceState::Cancelled),
-            _ => Err(Error::parsing("HeartsGameInstanceState", string))
-        }
-    }
-}
-
-impl <'a> From<&'a HeartsGameInstanceState> for String {
-    fn from(state: &'a HeartsGameInstanceState) -> String {
-        format!("{:?}", state)
+string_enum! {
+    HeartsGameInstanceState {
+        NotStarted,
+        Initiated,
+        Passing,
+        Dealing,
+        Finished,
+        Cancelled,
     }
 }
 

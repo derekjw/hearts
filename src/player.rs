@@ -168,9 +168,9 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn on_round_running(&mut self, game_status: &GameStatus) -> Result<()> {
-        self.update_activity_tracker(format!("My game - Round {} {:?}", game_status.current_round_id, game_status.my_game_state));
+        self.update_activity_tracker(format!("My game - Round {} {:?}", game_status.current_round_id, game_status.game_state));
 
-        match game_status.my_game_state {
+        match game_status.game_state {
             HeartsGameInstanceState::Passing => self.on_passing(game_status),
             HeartsGameInstanceState::Dealing => self.on_dealing(game_status),
             _ => Ok(())
@@ -191,7 +191,7 @@ impl<A: CardStrategy> Player<A> {
     fn on_dealing(&mut self, game_status: &GameStatus) -> Result<()> {
         if game_status.is_my_turn {
             self.display_my_current_hand(game_status);
-            let deal_number = game_status.my_in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
+            let deal_number = game_status.in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
             let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
             if !self.player_activity_tracker.contains(&key_dealing) {
                 try!(self.log_game_status(game_status, deal_number));

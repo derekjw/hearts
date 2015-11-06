@@ -21,8 +21,8 @@ impl DefensiveCardStrategy {
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
         let remaining_cards = game_status.unplayed_cards();
 
-        let potential_points = Self::potential_points(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards, &game_status.round_parameters);
-        let definite_points = if Self::will_win_deal(card, &game_status.my_game_players, &game_status.my_in_progress_deal, &remaining_cards) {
+        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &game_status.round_parameters);
+        let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards) {
             potential_points
         } else {
             0
@@ -195,7 +195,7 @@ impl CardStrategy for DefensiveCardStrategy {
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
-        let current_suit = game_status.my_in_progress_deal.as_ref().and_then(|deal| deal.suit);
+        let current_suit = game_status.in_progress_deal.as_ref().and_then(|deal| deal.suit);
         let mut valid_cards = game_status.my_current_hand.iter()
             .filter(|card| Some(card.suit) == current_suit)
             .collect::<Vec<&Card>>();

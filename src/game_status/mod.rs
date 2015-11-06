@@ -14,16 +14,16 @@ pub struct GameStatus {
     pub current_round_id: u32,
     pub current_round_state: RoundState,
     pub round_parameters: RoundParameters,
-    pub my_game_state: HeartsGameInstanceState,
-    pub my_game_state_description: String,
-    pub my_game_players: Vec<GameParticipant>,
+    pub game_state: HeartsGameInstanceState,
+    pub game_state_description: String,
+    pub game_players: Vec<GameParticipant>,
     pub my_initial_hand: BTreeSet<Card>,
     pub cards_passed_by_me: BTreeSet<Card>,
     pub cards_passed_to_me: BTreeSet<Card>,
     pub my_final_hand: BTreeSet<Card>,
     pub my_current_hand: BTreeSet<Card>,
-    pub my_game_deals: Vec<Deal>,
-    pub my_in_progress_deal: Option<Deal>,
+    pub game_deals: Vec<Deal>,
+    pub in_progress_deal: Option<Deal>,
     pub is_my_turn: bool,
 }
 
@@ -31,13 +31,13 @@ impl GameStatus {
     pub fn unplayed_cards(&self) -> BTreeSet<Card> {
         let mut cards = Card::all();
 
-        for deal in &self.my_game_deals {
+        for deal in &self.game_deals {
             for deal_card in &deal.deal_cards {
                 cards.remove(&deal_card.card);
             }
         }
 
-        if let &Some(ref deal) = &self.my_in_progress_deal {
+        if let &Some(ref deal) = &self.in_progress_deal {
             for deal_card in &deal.deal_cards {
                 cards.remove(&deal_card.card);
             }

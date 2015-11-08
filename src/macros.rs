@@ -1,6 +1,14 @@
 #[macro_use]
 
 macro_rules! string_enum {
+    ($name:ident ($($value:ident,)*)) => {
+        string_enum! {
+            $name {
+                $($value => $value,)*
+            }
+        }
+    };
+
     ($name:ident { $($value:ident,)* }) => {
         string_enum! {
             $name {
@@ -20,7 +28,9 @@ macro_rules! string_enum {
             #[allow(dead_code)]
             pub fn all() -> ::std::collections::BTreeSet<$name> {
                 use self::$name::*;
-                vec!($($value,)*).into_iter().collect()
+                let mut set = ::std::collections::BTreeSet::new();
+                $(set.insert($value);)*
+                set
             }
         }
 

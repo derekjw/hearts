@@ -2,6 +2,7 @@ use card_strategy::CardStrategy;
 
 use card::Card;
 use card::Suit;
+use card::Rank;
 use deal::Deal;
 use game_status::GameStatus;
 use game_status::RoundParameters;
@@ -14,9 +15,6 @@ use std::collections::BTreeSet;
 #[derive(Debug)]
 pub struct DefensiveCardStrategy;
 
-/*
-    Play 2 of clubs if in hand.
-*/
 impl DefensiveCardStrategy {
     fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
         let remaining_cards = game_status.unplayed_cards();
@@ -28,7 +26,12 @@ impl DefensiveCardStrategy {
             0
         };
         let later_potential_points = 0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
-        let card_rank = 0 - (u32::from(card.rank) as i32);
+        let rank_modifier = if game_status.round_parameters.points(card) < 0 {
+            -1
+        } else {
+            1
+        };
+        let card_rank =  0 - (u32::from(card.rank) as i32) * rank_modifier;
         (definite_points, potential_points, later_potential_points, card_rank)
     }
 
@@ -195,27 +198,32 @@ impl CardStrategy for DefensiveCardStrategy {
     }
 
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
-        let current_suit = game_status.in_progress_deal.as_ref().and_then(|deal| deal.suit);
-        let mut valid_cards = game_status.my_current_hand.iter()
-            .filter(|card| Some(card.suit) == current_suit)
-            .collect::<Vec<&Card>>();
+        let two_of_clubs = Rank::Two.of(Suit::Club);
+        if let Some(card) = game_status.my_current_hand.iter().find(|&card| card == &two_of_clubs) {
+            card
+        } else {
+            let current_suit = game_status.in_progress_deal.as_ref().and_then(|deal| deal.suit);
+            let mut valid_cards = game_status.my_current_hand.iter()
+                .filter(|card| Some(card.suit) == current_suit)
+                .collect::<Vec<&Card>>();
 
-        if valid_cards.is_empty() {
-            valid_cards.extend(&game_status.my_current_hand);
+            if valid_cards.is_empty() {
+                valid_cards.extend(&game_status.my_current_hand);
+            }
+
+            let evaluation = valid_cards.into_iter()
+                .map(|card| ((Self::score_card(card, game_status), card), card))
+                .collect::<BTreeMap<_,&Card>>();
+
+            // println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            // for item in &evaluation {
+            //     println!("{}: {:?}", item.1, (item.0).0);
+            // }
+
+            evaluation.values()
+                .next()
+                .expect("No valid cards to play!")
         }
-
-        let evaluation = valid_cards.into_iter()
-            .map(|card| ((Self::score_card(card, game_status), card), card))
-            .collect::<BTreeMap<_,&Card>>();
-
-        println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
-        for item in &evaluation {
-            println!("{}: {:?}", item.1, (item.0).0);
-        }
-
-        evaluation.values()
-            .next()
-            .expect("No valid cards to play!")
     }
 
 }
@@ -274,11 +282,11 @@ mod tests {
         should_play_heart_2 => Four.of(Heart)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
-        // should_play_high_rank_3 => Ace.of(Spade)
+        should_play_high_rank_3 => Ace.of(Spade)
         should_not_crash_during_card_play => Ten.of(Heart)
         // should_play_low_negative_points_card_1 => Two.of(Diamond)
         should_play_high_negative_points_card_1 => Ace.of(Diamond)
-        should_try_to_win_deal_1 => Ace.of(Club)
+        should_try_to_win_deal_1 => Queen.of(Club)
 
         // corrections to this game cause no difference to outcome
         normal_game_1_01_01 => Four.of(Club)

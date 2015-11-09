@@ -208,10 +208,10 @@ impl CardStrategy for DefensiveCardStrategy {
             .map(|card| ((Self::score_card(card, game_status), card), card))
             .collect::<BTreeMap<_,&Card>>();
 
-        // println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
-        // for item in &evaluation {
-        //     println!("{}: {:?}", item.1, (item.0).0);
-        // }
+        println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+        for item in &evaluation {
+            println!("{}: {:?}", item.1, (item.0).0);
+        }
 
         evaluation.values()
             .next()
@@ -241,7 +241,7 @@ mod tests {
     use std::io::Read;
 
     fn open_scenario(name: &str) -> GameStatus {
-        let file_name = format!("samples/scenarios/{}.json", name);
+        let file_name = format!("samples/scenarios/{}.json", name.replace("_", " "));
         let mut game_status_file = File::open(file_name).unwrap();
         let mut game_status_string = String::new();
         game_status_file.read_to_string(&mut game_status_string).unwrap();
@@ -256,64 +256,59 @@ mod tests {
         assert_eq!(expected_card, card);
     }
 
-    #[test]
-    fn normal_1() {
-        should_play("normal 1", Jack.of(Diamond));
+    macro_rules! test_play {
+        ($($name:ident => $card:expr)*) => {
+            $(#[test]
+            fn $name() {
+                should_play(stringify!($name), $card);
+            })*
+        }
     }
 
-    #[test]
-    fn normal_2() {
-        should_play("normal 2", King.of(Club));
-    }
+    test_play! {
+        normal_1 => Jack.of(Diamond)
+        normal_2 => King.of(Club)
+        normal_3 => Six.of(Spade)
 
-    #[test]
-    fn normal_3() {
-        should_play("normal 3", Six.of(Spade));
-    }
+        should_play_heart_1 => Seven.of(Heart)
+        should_play_heart_2 => Four.of(Heart)
+        should_play_high_rank_1 => King.of(Diamond)
+        should_play_high_rank_2 => Ace.of(Spade)
+        // should_play_high_rank_3 => Ace.of(Spade)
+        should_not_crash_during_card_play => Ten.of(Heart)
+        // should_play_low_negative_points_card_1 => Two.of(Diamond)
+        should_play_high_negative_points_card_1 => Ace.of(Diamond)
+        should_try_to_win_deal_1 => Ace.of(Club)
 
-    #[test]
-    fn should_play_heart_1() {
-        should_play("should play heart 1", Seven.of(Heart));
-    }
+        // corrections to this game cause no difference to outcome
+        normal_game_1_01_01 => Four.of(Club)
+        normal_game_1_01_02 => Eight.of(Heart)
+        normal_game_1_01_03 => Seven.of(Club) // Six.of(Club)
+        normal_game_1_01_04 => Five.of(Spade)
+        normal_game_1_01_05 => Ten.of(Club) // Seven.of(Club)
+        normal_game_1_01_06 => Seven.of(Heart)
+        normal_game_1_01_07 => Six.of(Heart)
+        normal_game_1_01_08 => Four.of(Diamond)
+        normal_game_1_01_09 => Ten.of(Club)
+        normal_game_1_01_10 => Nine.of(Club)
+        normal_game_1_01_11 => Three.of(Heart)
+        normal_game_1_01_12 => Four.of(Spade)
+        normal_game_1_01_13 => Two.of(Spade)
 
-    #[test]
-    fn should_play_heart_2() {
-        should_play("should play heart 2", Four.of(Heart));
-    }
-
-    #[test]
-    fn should_play_high_rank_1() {
-        should_play("should play high rank 1", King.of(Diamond));
-    }
-
-    #[test]
-    fn should_play_high_rank_2() {
-        should_play("should play high rank 2", Ace.of(Spade));
-    }
-
-    // #[test]
-    // fn should_play_high_rank_3() { // Should get rid of high risk high rank
-    //     should_play("should play high rank 3", Ace.of(Spade));
-    // }
-
-    #[test]
-    fn should_not_crash_during_card_play() {
-        should_play("crashed during card play", Ten.of(Heart));
-    }
-
-    // #[test]
-    // fn should_play_low_negative_points_card_1() {
-    //     should_play("should play low negative points card 1", Two.of(Diamond));
-    // }
-
-    #[test]
-    fn should_play_high_negative_points_card_1() {
-        should_play("should play high negative points card 1", Ace.of(Diamond));
-    }
-
-    #[test]
-    fn should_try_to_win_deal_1() {
-        should_play("should try to win deal 1", Ace.of(Club));
+        // corrections to this game cause no difference to outcome
+        normal_game_1_02_01 => Eight.of(Club) // Six of Club
+        normal_game_1_02_02 => Queen.of(Diamond)
+        normal_game_1_02_03 => Eight.of(Club)
+        normal_game_1_02_04 => Ace.of(Heart)
+        normal_game_1_02_05 => Three.of(Heart)
+        normal_game_1_02_06 => Eight.of(Diamond)
+        normal_game_1_02_07 => Five.of(Diamond)
+        normal_game_1_02_08 => Nine.of(Spade)
+        normal_game_1_02_09 => Eight.of(Spade)
+        normal_game_1_02_10 => Seven.of(Spade)
+        normal_game_1_02_11 => Six.of(Spade)
+        normal_game_1_02_12 => Three.of(Spade)
+        normal_game_1_02_13 => Two.of(Spade)
     }
 
 }

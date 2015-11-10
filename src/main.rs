@@ -22,14 +22,14 @@ mod card;
 mod player;
 mod game_status;
 mod deal;
-mod card_strategy;
+mod strategy;
 mod try_from;
 mod error;
 
 use player::Player;
 use player::PlayerName;
 use player::Password;
-use card_strategy::DefensiveCardStrategy;
+use strategy::DefensiveCardStrategy;
 
 use clap::App;
 

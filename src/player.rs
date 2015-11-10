@@ -1,4 +1,4 @@
-use card_strategy::CardStrategy;
+use strategy::CardStrategy;
 use game_status::{
     GameStatus,
     GameInstanceState,
@@ -179,7 +179,6 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn on_passing(&mut self, game_status: &GameStatus) -> Result<()> {
-        self.display_my_current_hand(game_status);
         let key_passing = format!("Passing - Round {}", game_status.current_round_id);
         if !self.player_activity_tracker.contains(&key_passing) {
             try!(self.log_game_status(game_status, 0));
@@ -191,7 +190,6 @@ impl<A: CardStrategy> Player<A> {
 
     fn on_dealing(&mut self, game_status: &GameStatus) -> Result<()> {
         if game_status.is_my_turn {
-            self.display_my_current_hand(game_status);
             let deal_number = game_status.in_progress_deal.as_ref().map(|deal| deal.deal_number).unwrap_or_default();
             let key_dealing = format!("Dealing - Round {} Deal {}", game_status.current_round_id, deal_number);
             if !self.player_activity_tracker.contains(&key_dealing) {
@@ -215,25 +213,6 @@ impl<A: CardStrategy> Player<A> {
         try!(file.write(&string.into_bytes()));
         try!(file.flush());
         Ok(())
-    }
-
-    fn display_my_current_hand(&mut self, game_status: &GameStatus) {
-        let key_display_current_hand_cards = game_status.my_current_hand.iter()
-            .map(|card| format!("{:?}-{:?}", card.suit, card.rank))
-            .collect::<Vec<String>>()
-            .join("|");
-        let key_display_current_hand = format!("{}-{}", game_status.current_round_id, key_display_current_hand_cards);
-
-        if !self.player_activity_tracker.contains(&key_display_current_hand) {
-            let display_current_hand_cards = game_status.my_current_hand.iter()
-                .map(|card| format!("{}", card))
-                .collect::<Vec<String>>()
-                .join(", ");
-            info!("My Current Hand : {}", display_current_hand_cards);
-            self.player_activity_tracker.insert(key_display_current_hand);
-        }
-
-
     }
 
     fn do_passing_activity(&mut self, game_status: &GameStatus) -> Result<()> {

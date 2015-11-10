@@ -1,4 +1,4 @@
-use card_strategy::CardStrategy;
+use strategy::CardStrategy;
 
 use card::Card;
 use game_status::GameStatus;

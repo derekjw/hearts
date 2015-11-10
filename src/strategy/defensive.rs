@@ -1,4 +1,4 @@
-use card_strategy::CardStrategy;
+use strategy::CardStrategy;
 
 use card::Card;
 use card::Suit;
@@ -190,6 +190,7 @@ impl DefensiveCardStrategy {
 impl CardStrategy for DefensiveCardStrategy {
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
+        info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
         let mut remaining_cards = game_status.unplayed_cards();
 
         let card1 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
@@ -219,7 +220,8 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| ((Self::score_card(card, game_status), card), card))
                 .collect::<BTreeMap<_,&Card>>();
 
-            info!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
                 info!("{}: {: >3}, {: >3}, {: >3}, {: >3}", item.1, ((item.0).0).0, ((item.0).0).1, ((item.0).0).2, ((item.0).0).3);
             }
@@ -241,7 +243,7 @@ mod tests {
     use card::Suit::*;
     use game_status::GameStatus;
     use game_status::dto::GameStatusDto;
-    use card_strategy::CardStrategy;
+    use strategy::CardStrategy;
 
     use try_from::TryFrom;
     use error::Error;

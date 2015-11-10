@@ -46,12 +46,13 @@ impl DefensiveCardStrategy {
     }
 
     fn will_win_deal(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> bool {
-        Self::can_win_deal(card, in_progress_deal) && (Self::plays_left(game_players, in_progress_deal).len() == 0 ||
-            Self::deal_suit(in_progress_deal)
-                .and_then(|suit| remaining_cards.iter()
-                    .filter(|card| card.suit == *suit)
-                    .max()
-                    .map(|winning_card| card.rank > winning_card.rank)).unwrap_or(true))
+        Self::can_win_deal(card, in_progress_deal) && (Self::plays_left(game_players, in_progress_deal).len() == 0 || {
+            let suit = Self::deal_suit(in_progress_deal).unwrap_or(&card.suit);
+            remaining_cards.iter()
+                .filter(|other| &other.suit == suit)
+                .max()
+                .map(|winning_card| card.rank > winning_card.rank).unwrap_or(true)
+        })
     }
 
     fn deal_suit(in_progress_deal: &Option<Deal>) -> Option<&Suit> {
@@ -98,6 +99,7 @@ impl DefensiveCardStrategy {
             let other_points: i32 = remaining_cards.iter()
                 .filter(|other| other.suit != card.suit)
                 .map(|other| round_parameters.points(other))
+                .filter(|points| points > &0)
                 .sum();
 
             let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
@@ -135,6 +137,7 @@ impl DefensiveCardStrategy {
         let other_points: i32 = remaining_cards.iter()
             .filter(|other| other.suit != card.suit)
             .map(|other| round_parameters.points(other))
+            .filter(|points| points > &0)
             .sum();
 
         let other_win_points = (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32;
@@ -215,10 +218,10 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| ((Self::score_card(card, game_status), card), card))
                 .collect::<BTreeMap<_,&Card>>();
 
-            // println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
-            // for item in &evaluation {
-            //     println!("{}: {:?}", item.1, (item.0).0);
-            // }
+            println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            for item in &evaluation {
+                println!("{}: {:?}", item.1, (item.0).0);
+            }
 
             evaluation.values()
                 .next()
@@ -280,6 +283,7 @@ mod tests {
 
         should_play_heart_1 => Seven.of(Heart)
         should_play_heart_2 => Four.of(Heart)
+        should_not_play_high_heart_1 => Six.of(Spade)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
         should_play_high_rank_3 => Ace.of(Spade)

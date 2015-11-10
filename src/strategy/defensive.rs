@@ -9,6 +9,7 @@ use game_status::RoundParameters;
 use game_status::GameParticipant;
 use player::PlayerName;
 
+use std::fmt;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
@@ -16,23 +17,33 @@ use std::collections::BTreeSet;
 pub struct DefensiveCardStrategy;
 
 impl DefensiveCardStrategy {
-    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> (i32, i32, i32, i32) {
+    fn score_card<'a>(card: &'a Card, game_status: &'a GameStatus) -> CardScore {
         let remaining_cards = game_status.unplayed_cards();
 
         let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &game_status.round_parameters);
+
         let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards) {
             potential_points
         } else {
             0
         };
+
         let later_potential_points = 0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
+
         let rank_modifier = if game_status.round_parameters.points(card) < 0 {
             -1
         } else {
             1
         };
+
         let card_rank =  0 - (u32::from(card.rank) as i32) * rank_modifier;
-        (definite_points, potential_points, later_potential_points, card_rank)
+
+        CardScore {
+            definite_points: definite_points,
+            potential_points: potential_points,
+            later_potential_points: later_potential_points,
+            rank: card_rank,
+        }
     }
 
     fn can_win_deal(card: &Card, in_progress_deal: &Option<Deal>) -> bool {
@@ -221,9 +232,10 @@ impl CardStrategy for DefensiveCardStrategy {
                 .collect::<BTreeMap<_,&Card>>();
 
             info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
-            info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
+            info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
-                info!("{}: {: >3}, {: >3}, {: >3}, {: >3}", item.1, ((item.0).0).0, ((item.0).0).1, ((item.0).0).2, ((item.0).0).3);
+                let (&(ref score, _), ref card) = item;
+                info!("{}: {}", card, score);
             }
 
             evaluation.values()
@@ -232,6 +244,21 @@ impl CardStrategy for DefensiveCardStrategy {
         }
     }
 
+}
+
+#[derive(Debug, PartialEq, PartialOrd, Eq, Ord)]
+struct CardScore {
+    definite_points: i32,
+    potential_points: i32,
+    later_potential_points: i32,
+    rank: i32,
+}
+
+impl fmt::Display for CardScore {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{: >3}, {: >3}, {: >3}, {: >3}",
+            self.definite_points, self.potential_points, self.later_potential_points, self.rank)
+    }
 }
 
 #[cfg(test)]

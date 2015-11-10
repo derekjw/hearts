@@ -36,13 +36,14 @@ impl DefensiveCardStrategy {
     }
 
     fn can_win_deal(card: &Card, in_progress_deal: &Option<Deal>) -> bool {
-        in_progress_deal.as_ref().and_then(|deal|
-            deal.suit.and_then(|suit|
-                deal.deal_cards.iter()
-                    .map(|deal_card| deal_card.card)
-                    .filter(|card| card.suit == suit)
-                    .max()
-                    .map(|winning_card| card.suit == suit && card.rank > winning_card.rank))).unwrap_or(true)
+        in_progress_deal.as_ref().and_then(|deal| {
+            let suit = &deal.suit.unwrap_or(card.suit);
+            deal.deal_cards.iter()
+                .map(|deal_card| deal_card.card)
+                .filter(|other| &other.suit == suit)
+                .max()
+                .map(|winning_card| &card.suit == suit && card.rank > winning_card.rank)
+        }).unwrap_or(true)
     }
 
     fn will_win_deal(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> bool {

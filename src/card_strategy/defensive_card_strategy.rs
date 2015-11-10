@@ -219,9 +219,9 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| ((Self::score_card(card, game_status), card), card))
                 .collect::<BTreeMap<_,&Card>>();
 
-            println!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("Remaining: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
             for item in &evaluation {
-                println!("{}: {:?}", item.1, (item.0).0);
+                info!("{}: {: >3}, {: >3}, {: >3}, {: >3}", item.1, ((item.0).0).0, ((item.0).0).1, ((item.0).0).2, ((item.0).0).3);
             }
 
             evaluation.values()

@@ -160,7 +160,8 @@ impl<A: CardStrategy> Player<A> {
 
             match game_status.current_round_state {
                 RoundState::Running => self.on_round_running(game_status),
-                _ => Ok(())
+                RoundState::Finished => self.log_game_status(game_status, 14),
+                _ => Ok(()),
             }
         } else {
             Ok(())

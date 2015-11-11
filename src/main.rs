@@ -55,7 +55,6 @@ fn main() {
 
     info!("Start Game");
 
-    // Settings.init();
     let player = Player::new(player_name, password, server, DefensiveCardStrategy, repeat);
     player.play();
 }

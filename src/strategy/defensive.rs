@@ -50,7 +50,7 @@ impl DefensiveCardStrategy {
         in_progress_deal.as_ref().and_then(|deal| {
             let suit = &deal.suit.unwrap_or(card.suit);
             deal.deal_cards.iter()
-                .map(|deal_card| deal_card.card)
+                .map(|deal_card| &deal_card.card)
                 .filter(|other| &other.suit == suit)
                 .max()
                 .map(|winning_card| &card.suit == suit && card.rank > winning_card.rank)

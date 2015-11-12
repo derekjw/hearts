@@ -114,10 +114,10 @@ impl DefensiveCardStrategy {
                 .filter(|points| points > &0)
                 .sum();
 
-            let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
-            let number_dealt = dealt_cards.len() as u32;
+            let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<i32>();
+            let number_dealt = dealt_cards.len() as i32;
 
-            let safe_target = 8 - number_dealt;
+            let safe_target = 9 + card_points - number_dealt;
 
             let suit_win_points = if number_dealt < 3 {
                 (Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * (suit_points as f32)) as i32
@@ -324,7 +324,7 @@ mod tests {
         should_try_to_win_deal_1 => Queen.of(Club)
 
         // corrections to this game cause no difference to outcome
-        normal_game_1_01_01 => Ten.of(Club) // Four.of(Club)
+        normal_game_1_01_01 => Four.of(Club)
         normal_game_1_01_02 => Eight.of(Heart)
         normal_game_1_01_03 => Seven.of(Club) // Six.of(Club)
         normal_game_1_01_04 => Five.of(Spade)

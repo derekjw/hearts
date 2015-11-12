@@ -117,7 +117,7 @@ impl DefensiveCardStrategy {
             let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<u32>();
             let number_dealt = dealt_cards.len() as u32;
 
-            let safe_target = 10 - number_dealt;
+            let safe_target = 8 - number_dealt;
 
             let suit_win_points = if number_dealt < 3 {
                 (Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * (suit_points as f32)) as i32
@@ -231,11 +231,11 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| ((Self::score_card(card, game_status), card), card))
                 .collect::<BTreeMap<_,&Card>>();
 
-            info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            println!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
             info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
                 let (&(ref score, _), ref card) = item;
-                info!("{}: {}", card, score);
+                println!("{}: {}", card, score);
             }
 
             evaluation.values()
@@ -320,10 +320,11 @@ mod tests {
         should_not_crash_during_card_play => Ten.of(Heart)
         // should_play_low_negative_points_card_1 => Two.of(Diamond)
         should_play_high_negative_points_card_1 => Ace.of(Diamond)
+        should_play_high_negative_points_card_2 => King.of(Diamond)
         should_try_to_win_deal_1 => Queen.of(Club)
 
         // corrections to this game cause no difference to outcome
-        normal_game_1_01_01 => Four.of(Club)
+        normal_game_1_01_01 => Ten.of(Club) // Four.of(Club)
         normal_game_1_01_02 => Eight.of(Heart)
         normal_game_1_01_03 => Seven.of(Club) // Six.of(Club)
         normal_game_1_01_04 => Five.of(Spade)

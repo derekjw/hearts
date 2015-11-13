@@ -231,11 +231,11 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| ((Self::score_card(card, game_status), card), card))
                 .collect::<BTreeMap<_,&Card>>();
 
-            println!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
             info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
                 let (&(ref score, _), ref card) = item;
-                println!("{}: {}", card, score);
+                info!("{}: {}", card, score);
             }
 
             evaluation.values()

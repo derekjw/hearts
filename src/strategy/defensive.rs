@@ -24,7 +24,9 @@ impl DefensiveCardStrategy {
             game_status.unplayed_cards().into_iter().filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
         };
 
-        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &game_status.round_parameters);
+        let void_suits = Self::void_suits(game_status);
+
+        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &void_suits, &game_status.round_parameters);
 
         let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards) {
             potential_points
@@ -48,6 +50,21 @@ impl DefensiveCardStrategy {
             later_potential_points: later_potential_points,
             rank: card_rank,
         }
+    }
+
+    fn void_suits(game_status: &GameStatus) -> BTreeMap<&PlayerName, BTreeSet<Suit>> {
+        game_status.game_players.iter()
+            .map(|player| (&player.team_name, Self::player_void_suits(game_status, &player.team_name)))
+            .collect()
+
+    }
+
+    fn player_void_suits(game_status: &GameStatus, player_name: &PlayerName) -> BTreeSet<Suit> {
+        game_status.game_deals.iter()
+            .filter_map(|deal|
+                deal.suit.and_then(|suit|
+                    deal.deal_cards.iter().filter(|deal_card| &deal_card.player_name == player_name && deal_card.card.suit != suit).map(|_| suit).next()))
+            .collect()
     }
 
     fn can_win_deal(card: &Card, in_progress_deal: &Option<Deal>) -> bool {
@@ -96,7 +113,7 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
-    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
+    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> i32 {
         if Self::can_win_deal(card, in_progress_deal) {
             let dealt_cards = Self::dealt_cards(in_progress_deal);
 
@@ -129,7 +146,11 @@ impl DefensiveCardStrategy {
                 0
             };
 
-            let other_win_points = if number_of_suit < safe_target && number_dealt < 3 {
+            let plays_left = Self::plays_left(game_players, in_progress_deal);
+
+            let voider = void_suits.iter().filter(|&(player_name, ref player_void_suits)| plays_left.contains(player_name) && player_void_suits.contains(&card.suit)).next().is_some();
+
+            let other_win_points = if voider || (number_of_suit < safe_target && number_dealt < 3) {
                 (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32
             } else {
                 0

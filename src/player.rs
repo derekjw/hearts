@@ -18,6 +18,7 @@ use std::io::Write;
 use std::collections::BTreeSet;
 use std::time::Duration;
 use std::thread;
+use std::fmt;
 
 use hyper;
 use hyper::Client;
@@ -33,6 +34,13 @@ impl PlayerName {
     pub fn new<A>(value: A) -> PlayerName
     where A: Into<String> {
         PlayerName(value.into())
+    }
+}
+
+impl fmt::Display for PlayerName {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let &PlayerName(ref string) = self;
+        write!(f, "{}", string)
     }
 }
 

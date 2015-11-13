@@ -18,7 +18,9 @@ pub struct DefensiveCardStrategy;
 
 impl DefensiveCardStrategy {
     fn score_card(card: &Card, game_status: &GameStatus) -> CardScore {
-        let remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
+        let remaining_cards = game_status.unplayed_cards();
+
+        let safe_remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
             game_status.unplayed_cards()
         } else {
             game_status.unplayed_cards().into_iter().filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
@@ -26,9 +28,9 @@ impl DefensiveCardStrategy {
 
         let void_suits = Self::void_suits(game_status);
 
-        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &void_suits, &game_status.round_parameters);
+        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards, &void_suits, &game_status.round_parameters);
 
-        let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards) {
+        let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards) {
             potential_points
         } else {
             0
@@ -257,6 +259,12 @@ impl CardStrategy for DefensiveCardStrategy {
                 .collect::<BTreeMap<_,&Card>>();
 
             info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("Void: {}", Self::void_suits(game_status).iter()
+                .map(|(player_name, ref player_void_suits)|
+                    format!("{}[{}]", player_name, player_void_suits.iter()
+                        .map(|suit| format!("{}", suit))
+                        .collect::<Vec<_>>().join("")))
+                .collect::<Vec<_>>().join(", "));
             info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
                 let (&(ref score, _), ref card) = item;

@@ -18,7 +18,11 @@ pub struct DefensiveCardStrategy;
 
 impl DefensiveCardStrategy {
     fn score_card(card: &Card, game_status: &GameStatus) -> CardScore {
-        let remaining_cards = game_status.unplayed_cards();
+        let remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
+            game_status.unplayed_cards()
+        } else {
+            game_status.unplayed_cards().into_iter().filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
+        };
 
         let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards, &game_status.round_parameters);
 

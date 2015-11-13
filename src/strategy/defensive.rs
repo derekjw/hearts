@@ -217,8 +217,8 @@ impl DefensiveCardStrategy {
             .filter(|card| !remaining_cards.contains(card))
             .map(|card| ((0 - Self::later_potential_points(card, &remaining_cards, round_parameters), card), card))
             .collect::<BTreeMap<_, &Card>>()
-            .into_iter()
-            .map(|(_, card)| card)
+            .values()
+            .cloned()
             .next()
     }
 

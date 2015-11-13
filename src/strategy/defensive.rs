@@ -218,7 +218,7 @@ impl DefensiveCardStrategy {
             .map(|card| ((0 - Self::later_potential_points(card, &remaining_cards, round_parameters), card), card))
             .collect::<BTreeMap<_, &Card>>()
             .into_iter()
-            .map(|kv| kv.1)
+            .map(|(_, card)| card)
             .next()
     }
 

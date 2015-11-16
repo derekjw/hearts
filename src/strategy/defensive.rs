@@ -23,11 +23,17 @@ impl DefensiveCardStrategy {
         let void_suits = Self::void_suits(game_status);
 
         let plays_left = Self::plays_left(&game_status.game_players, &game_status.in_progress_deal);
+
         let deal_void_suits = void_suits.iter()
             .filter(|&(player, _)| plays_left.contains(player))
-            .flat_map(|(_, suits)| suits.iter())
-            .cloned()
-            .collect::<BTreeSet<_>>();
+            .map(|(_, suits)| suits)
+            .fold(None as Option<BTreeSet<Suit>>, |option_result, suits| {
+                match option_result {
+                    Some(result) => Some(result.intersection(suits).cloned().collect()),
+                    None => Some(suits.clone())
+                }
+            })
+            .unwrap_or(BTreeSet::new());
 
         let safe_remaining_cards_iter = game_status.unplayed_cards().into_iter().filter(|other| !deal_void_suits.contains(&other.suit));
 
@@ -355,7 +361,7 @@ mod tests {
 
         should_play_heart_1 => Seven.of(Heart)
         should_play_heart_2 => Four.of(Heart)
-        should_not_play_high_heart_1 => Jack.of(Spade)
+        should_not_play_high_heart_1 => Six.of(Spade)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
         should_play_high_rank_3 => Ace.of(Spade)

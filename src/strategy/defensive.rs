@@ -20,13 +20,22 @@ impl DefensiveCardStrategy {
     fn score_card(card: &Card, game_status: &GameStatus) -> CardScore {
         let remaining_cards = game_status.unplayed_cards();
 
-        let safe_remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
-            game_status.unplayed_cards()
-        } else {
-            game_status.unplayed_cards().into_iter().filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
-        };
-
         let void_suits = Self::void_suits(game_status);
+
+        let plays_left = Self::plays_left(&game_status.game_players, &game_status.in_progress_deal);
+        let deal_void_suits = void_suits.iter()
+            .filter(|&(player, _)| plays_left.contains(player))
+            .flat_map(|(_, suits)| suits.iter())
+            .cloned()
+            .collect::<BTreeSet<_>>();
+
+        let safe_remaining_cards_iter = game_status.unplayed_cards().into_iter().filter(|other| !deal_void_suits.contains(&other.suit));
+
+        let safe_remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
+            safe_remaining_cards_iter.collect::<BTreeSet<_>>()
+        } else {
+            safe_remaining_cards_iter.filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
+        };
 
         let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards, &void_suits, &game_status.round_parameters);
 
@@ -346,7 +355,7 @@ mod tests {
 
         should_play_heart_1 => Seven.of(Heart)
         should_play_heart_2 => Four.of(Heart)
-        should_not_play_high_heart_1 => Six.of(Spade)
+        should_not_play_high_heart_1 => Jack.of(Spade)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
         should_play_high_rank_3 => Ace.of(Spade)

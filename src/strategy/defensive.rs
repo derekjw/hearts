@@ -52,12 +52,49 @@ impl DefensiveCardStrategy {
 
         let card_rank =  0 - (u32::from(card.rank) as i32) * rank_modifier;
 
-        CardScore {
+        let card_score = CardScore {
             definite_points: definite_points,
             potential_points: potential_points,
             later_potential_points: later_potential_points,
             rank: card_rank,
+        };
+
+        Self::possible_shooter(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters)
+            .map(|shooter| {
+                info!("Possible shooter: {}", shooter.team_name);
+                card_score.invert()
+            })
+            .unwrap_or(card_score)
+    }
+
+    fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
+        let possible_shooters = game_players.iter()
+            .map(|player|
+                (player, Self::cards_won(deals, &player.team_name).iter()
+                    .filter(|card| Self::shooting_card(card))
+                    .map(|card| round_parameters.points(card))
+                    .sum::<i32>()))
+            .collect::<Vec<_>>();
+        if possible_shooters.len() == 1 {
+            possible_shooters.into_iter()
+                .filter(|&(_, shoot_score)| shoot_score > 13)
+                .map(|(player, _)| player)
+                .next()
+        } else {
+            None
         }
+    }
+
+    fn cards_won<'a>(deals: &'a Vec<Deal>, player: &PlayerName) -> BTreeSet<&'a Card> {
+        deals.iter()
+            .filter(|deal| deal.deal_winner.as_ref().map(|winner| winner == player).unwrap_or(false))
+            .flat_map(|deal| deal.deal_cards.iter())
+            .map(|deal_card| &deal_card.card)
+            .collect()
+    }
+
+    fn shooting_card(card: &Card) -> bool {
+        card.suit == Suit::Heart || (card.suit == Suit::Spade && card.rank == Rank::Queen)
     }
 
     fn deal_void_suits(void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, plays_left: &BTreeSet<&PlayerName>) -> BTreeSet<Suit> {
@@ -303,6 +340,17 @@ struct CardScore {
     potential_points: i32,
     later_potential_points: i32,
     rank: i32,
+}
+
+impl CardScore {
+    pub fn invert(&self) -> CardScore {
+        CardScore {
+            definite_points: 0 - self.definite_points,
+            potential_points: 0 - self.potential_points,
+            later_potential_points: 0 - self.later_potential_points,
+            rank: 0 - self.rank,
+        }
+    }
 }
 
 impl fmt::Display for CardScore {

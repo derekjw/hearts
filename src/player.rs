@@ -39,15 +39,19 @@ impl PlayerName {
 
 impl fmt::Display for PlayerName {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let &PlayerName(ref string) = self;
-        write!(f, "{}", string)
+        write!(f, "{}", &self.0)
     }
 }
 
 impl From<PlayerName> for String {
     fn from(player: PlayerName) -> String {
-        let PlayerName(string) = player;
-        string
+        player.0
+    }
+}
+
+impl <'a> From<&'a PlayerName> for &'a str {
+    fn from(player: &'a PlayerName) -> &'a str {
+        &player.0
     }
 }
 

@@ -257,6 +257,7 @@ impl CardStrategy for DefensiveCardStrategy {
         vec!(card1, card2, card3).into_iter().filter_map(|card| card).collect()
     }
 
+    #[allow(unused_variables)]
     fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
         let two_of_clubs = Rank::Two.of(Suit::Club);
         if let Some(card) = game_status.my_current_hand.iter().find(|&card| card == &two_of_clubs) {

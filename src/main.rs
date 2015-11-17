@@ -1,5 +1,3 @@
-#![allow(unused_variables)]
-
 #![feature(dir_builder)]
 #![feature(iter_arith)]
 #![feature(custom_attribute)]

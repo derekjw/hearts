@@ -24,16 +24,7 @@ impl DefensiveCardStrategy {
 
         let plays_left = Self::plays_left(&game_status.game_players, &game_status.in_progress_deal);
 
-        let deal_void_suits = void_suits.iter()
-            .filter(|&(player, _)| plays_left.contains(player))
-            .map(|(_, suits)| suits)
-            .fold(None as Option<BTreeSet<Suit>>, |option_result, suits| {
-                match option_result {
-                    Some(result) => Some(result.intersection(suits).cloned().collect()),
-                    None => Some(suits.clone())
-                }
-            })
-            .unwrap_or(BTreeSet::new());
+        let deal_void_suits = Self::deal_void_suits(&void_suits, &plays_left);
 
         let safe_remaining_cards_iter = game_status.unplayed_cards().into_iter().filter(|other| !deal_void_suits.contains(&other.suit));
 
@@ -67,6 +58,17 @@ impl DefensiveCardStrategy {
             later_potential_points: later_potential_points,
             rank: card_rank,
         }
+    }
+
+    fn deal_void_suits(void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, plays_left: &BTreeSet<&PlayerName>) -> BTreeSet<Suit> {
+        void_suits.iter()
+            .filter(|&(player, _)| plays_left.contains(player))
+            .map(|(_, suits)| suits)
+            .fold(None as Option<BTreeSet<Suit>>, |option_result, suits|
+                option_result
+                    .map(|result| result.intersection(suits).cloned().collect())
+                    .or_else(|| Some(suits.clone())))
+            .unwrap_or_default()
     }
 
     fn void_suits(game_status: &GameStatus) -> BTreeMap<&PlayerName, BTreeSet<Suit>> {

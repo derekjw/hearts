@@ -71,6 +71,7 @@ impl DefensiveCardStrategy {
                     .filter(|card| Self::shooting_card(card))
                     .map(|card| round_parameters.points(card))
                     .sum::<i32>()))
+            .filter(|&(_, shoot_score)| shoot_score > 0)
             .collect::<Vec<_>>();
         if possible_shooters.len() == 1 {
             possible_shooters.into_iter()

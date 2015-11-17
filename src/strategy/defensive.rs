@@ -60,10 +60,7 @@ impl DefensiveCardStrategy {
         };
 
         Self::possible_shooter(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters)
-            .map(|shooter| {
-                info!("Possible shooter: {}", shooter.team_name);
-                card_score.invert()
-            })
+            .map(|_| card_score.invert())
             .unwrap_or(card_score)
     }
 

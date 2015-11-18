@@ -39,10 +39,10 @@ impl DefensiveCardStrategy {
         let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards) {
             potential_points
         } else {
-            0
+            0.0
         };
 
-        let later_potential_points = 0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
+        let later_potential_points = 0.0 - Self::later_potential_points(card, &remaining_cards, &game_status.round_parameters);
 
         let rank_modifier = if game_status.round_parameters.points(card) < 0 {
             -1
@@ -53,9 +53,9 @@ impl DefensiveCardStrategy {
         let card_rank =  0 - (u32::from(card.rank) as i32) * rank_modifier;
 
         let card_score = CardScore {
-            definite_points: definite_points,
-            potential_points: potential_points,
-            later_potential_points: later_potential_points,
+            definite_points: (definite_points * 1000.0) as i32,
+            potential_points: (potential_points * 1000.0) as i32,
+            later_potential_points: (later_potential_points * 1000.0) as i32,
             rank: card_rank,
         };
 
@@ -170,71 +170,74 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
-    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> i32 {
+    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> f32 {
         if Self::can_win_deal(card, in_progress_deal) {
             let dealt_cards = Self::dealt_cards(in_progress_deal);
 
-            let card_points = round_parameters.points(card);
+            let card_points = round_parameters.points(card) as f32;
 
-            let dealt_points: i32 = dealt_cards.iter()
+            let dealt_points = dealt_cards.iter()
                 .map(|other| round_parameters.points(other))
-                .sum();
+                .sum::<i32>() as f32;
 
-            let suit_points: i32 = remaining_cards.iter()
+            let suit_points = remaining_cards.iter()
                 .filter(|other| other.suit == card.suit)
                 .filter(|other| other.rank < card.rank)
                 .map(|other| round_parameters.points(other))
-                .sum();
+                .sum::<i32>() as f32;
 
-            let other_points: i32 = remaining_cards.iter()
+            let other_points = remaining_cards.iter()
                 .filter(|other| other.suit != card.suit)
                 .map(|other| round_parameters.points(other))
                 .filter(|points| points > &0)
-                .sum();
+                .sum::<i32>() as f32;
 
             let number_of_suit = remaining_cards.iter().filter(|other| other.suit == card.suit).map(|_| 1).sum::<i32>();
-            let number_dealt = dealt_cards.len() as i32;
+            let number_dealt = dealt_cards.len();
 
-            let safe_target = 9 + card_points - number_dealt;
+            let safe_target = 9.0 + card_points - (number_dealt as f32);
 
             let suit_win_points = if number_dealt < 3 {
-                (Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * (suit_points as f32)) as i32
+                Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * suit_points
             } else {
-                0
+                0.0
             };
 
             let plays_left = Self::plays_left(game_players, in_progress_deal);
 
-            let voider = void_suits.iter().filter(|&(player_name, ref player_void_suits)| plays_left.contains(player_name) && player_void_suits.contains(&card.suit)).next().is_some();
+            let voider = void_suits.iter()
+                .filter(|&(player_name, ref player_void_suits)| plays_left.contains(player_name) && player_void_suits.contains(&card.suit))
+                .next()
+                .is_some();
 
-            let other_win_points = if voider || (number_of_suit < safe_target && number_dealt < 3) {
-                (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32
+            let other_win_points = if voider || ((number_of_suit as f32) < safe_target && number_dealt < 3) {
+                Self::chance_of_later_win(card, remaining_cards) * other_points
             } else {
-                0
+                0.0
             };
 
             card_points + dealt_points + suit_win_points + other_win_points
         } else {
-            0
+            0.0
         }
     }
 
-    fn later_potential_points(card: &Card, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> i32 {
-        let card_points = round_parameters.points(card);
+    fn later_potential_points(card: &Card, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> f32 {
+        let card_points = round_parameters.points(card) as f32;
 
-        let suit_points: i32 = remaining_cards.iter()
+        let suit_points = remaining_cards.iter()
             .filter(|other| other.suit == card.suit)
             .filter(|other| other.rank < card.rank)
             .map(|other| round_parameters.points(other))
-            .sum();
+            .sum::<i32>() as f32;
 
-        let other_points: i32 = remaining_cards.iter()
+        let other_points = remaining_cards.iter()
             .filter(|other| other.suit != card.suit)
             .map(|other| round_parameters.points(other))
             .filter(|points| points > &0)
-            .sum();
+            .sum::<i32>() as f32;
 
-        let other_win_points = (Self::chance_of_later_win(card, remaining_cards) * (other_points as f32)) as i32;
+        let other_win_points = Self::chance_of_later_win(card, remaining_cards) * other_points;
 
         card_points + suit_points + other_win_points
     }
@@ -270,7 +273,7 @@ impl DefensiveCardStrategy {
     fn pass_card<'a>(hand: &'a BTreeSet<Card>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> Option<&'a Card> {
         hand.iter()
             .filter(|card| !remaining_cards.contains(card))
-            .map(|card| ((0 - Self::later_potential_points(card, &remaining_cards, round_parameters), card), card))
+            .map(|card| ((0 - (Self::later_potential_points(card, &remaining_cards, round_parameters) * 1000.0) as i32, card), card))
             .collect::<BTreeMap<_, &Card>>()
             .values()
             .cloned()
@@ -356,8 +359,11 @@ impl CardScore {
 
 impl fmt::Display for CardScore {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{: >3}, {: >3}, {: >3}, {: >3}",
-            self.definite_points, self.potential_points, self.later_potential_points, self.rank)
+        write!(f, "{: >3.3}, {: >3.3}, {: >3.3}, {: >3.2}",
+            self.definite_points as f32 / 1000.0,
+            self.potential_points as f32 / 1000.0,
+            self.later_potential_points as f32 / 1000.0,
+            self.rank)
     }
 }
 
@@ -413,7 +419,7 @@ mod tests {
 
         should_play_heart_1 => Seven.of(Heart)
         should_play_heart_2 => Four.of(Heart)
-        should_not_play_high_heart_1 => Six.of(Spade)
+        should_not_play_high_heart_1 => Three.of(Spade)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
         should_play_high_rank_3 => Ace.of(Spade)

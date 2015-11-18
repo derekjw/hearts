@@ -197,8 +197,14 @@ impl DefensiveCardStrategy {
 
             let safe_target = 9.0 + card_points - (number_dealt as f32);
 
+            let suit_win_modifier = if suit_points < 0.0 && dealt_points > 2.0 {
+                0.0 - 0.5
+            } else {
+                1.0
+            };
+
             let suit_win_points = if number_dealt < 3 {
-                Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * suit_points
+                Self::chance_of_win(card, game_players, in_progress_deal, remaining_cards) * suit_points * suit_win_modifier
             } else {
                 0.0
             };
@@ -359,7 +365,7 @@ impl CardScore {
 
 impl fmt::Display for CardScore {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{: >3.3}, {: >3.3}, {: >3.3}, {: >3.2}",
+        write!(f, "{: >7.3}, {: >7.3}, {: >7.3}, {: >3.2}",
             self.definite_points as f32 / 1000.0,
             self.potential_points as f32 / 1000.0,
             self.later_potential_points as f32 / 1000.0,
@@ -428,6 +434,8 @@ mod tests {
         should_play_high_negative_points_card_1 => Ace.of(Diamond)
         should_play_high_negative_points_card_2 => King.of(Diamond)
         should_try_to_win_deal_1 => Queen.of(Club)
+        should_prevent_shooter_1 => King.of(Heart)
+        should_play_low_club_1 => Four.of(Club)
 
         // corrections to this game cause no difference to outcome
         normal_game_1_01_01 => Four.of(Club)

@@ -1,0 +1,729 @@
+{
+  "CurrentGameId": "464ff435177f4eaaa526236f71deefde",
+  "CurrentGameState": "Running",
+  "CurrentRoundId": 2,
+  "CurrentRoundState": "Running",
+  "RoundParameters": {
+    "RoundId": 2,
+    "InitiationPhaseInSeconds": 5,
+    "PassingPhaseInSeconds": 15,
+    "DealingPhaseInSeconds": 5,
+    "FinishingPhaseInSeconds": 5,
+    "NumberOfCardsTobePassed": 3,
+    "CardPoints": [
+      {
+        "Card": {
+          "Suit": "Spade",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 13
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 2,
+          "Symbol": "2"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 3,
+          "Symbol": "3"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 4,
+          "Symbol": "4"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 5,
+          "Symbol": "5"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 6,
+          "Symbol": "6"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 7,
+          "Symbol": "7"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 8,
+          "Symbol": "8"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 9,
+          "Symbol": "9"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 10,
+          "Symbol": "10"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 11,
+          "Symbol": "J"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 13,
+          "Symbol": "K"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 14,
+          "Symbol": "A"
+        },
+        "Point": 1
+      }
+    ]
+  },
+  "MyGameState": "Dealing",
+  "MyGameStateDescription": "Playing",
+  "MyGameParticipants": [
+    {
+      "TeamName": "Pankaj",
+      "LeftParticipant": "Yogis",
+      "NumberOfCardsInHand": 4,
+      "HasTurn": false,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "Yogis",
+      "LeftParticipant": "Derek Williams",
+      "NumberOfCardsInHand": 3,
+      "HasTurn": false,
+      "CurrentScore": 21
+    },
+    {
+      "TeamName": "Derek Williams",
+      "LeftParticipant": "Dummy-0",
+      "NumberOfCardsInHand": 4,
+      "HasTurn": true,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "Dummy-0",
+      "LeftParticipant": "Pankaj",
+      "NumberOfCardsInHand": 4,
+      "HasTurn": false,
+      "CurrentScore": 0
+    }
+  ],
+  "MyInitialHand": [
+    {
+      "Suit": "Spade",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 2,
+      "Symbol": "2"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 4,
+      "Symbol": "4"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 6,
+      "Symbol": "6"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 9,
+      "Symbol": "9"
+    },
+    {
+      "Suit": "Club",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Club",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Club",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "CardsPassedByMe": [
+    {
+      "Suit": "Club",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Club",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "CardsPassedToMe": [
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    }
+  ],
+  "MyFinalHand": [
+    {
+      "Suit": "Spade",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 2,
+      "Symbol": "2"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 4,
+      "Symbol": "4"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 6,
+      "Symbol": "6"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 9,
+      "Symbol": "9"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 11,
+      "Symbol": "J"
+    }
+  ],
+  "MyCurrentHand": [
+    {
+      "Suit": "Heart",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 9,
+      "Symbol": "9"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 12,
+      "Symbol": "Q"
+    }
+  ],
+  "MyGameDeals": [
+    {
+      "DealNumber": 1,
+      "Initiator": "Dummy-0",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Club",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Club",
+            "Number": 9,
+            "Symbol": "9"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Club",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        }
+      ],
+      "DealWinner": "Derek Williams"
+    },
+    {
+      "DealNumber": 2,
+      "Initiator": "Derek Williams",
+      "SuitType": "Spade",
+      "DealCards": [
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 13,
+            "Symbol": "K"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        }
+      ],
+      "DealWinner": "Dummy-0"
+    },
+    {
+      "DealNumber": 3,
+      "Initiator": "Dummy-0",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Club",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Club",
+            "Number": 8,
+            "Symbol": "8"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Club",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 14,
+            "Symbol": "A"
+          }
+        }
+      ],
+      "DealWinner": "Yogis"
+    },
+    {
+      "DealNumber": 4,
+      "Initiator": "Yogis",
+      "SuitType": "Diamond",
+      "DealCards": [
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 13,
+            "Symbol": "K"
+          }
+        }
+      ],
+      "DealWinner": "Pankaj"
+    },
+    {
+      "DealNumber": 5,
+      "Initiator": "Pankaj",
+      "SuitType": "Heart",
+      "DealCards": [
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        }
+      ],
+      "DealWinner": "Yogis"
+    },
+    {
+      "DealNumber": 6,
+      "Initiator": "Yogis",
+      "SuitType": "Spade",
+      "DealCards": [
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        }
+      ],
+      "DealWinner": "Derek Williams"
+    },
+    {
+      "DealNumber": 7,
+      "Initiator": "Derek Williams",
+      "SuitType": "Heart",
+      "DealCards": [
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 12,
+            "Symbol": "Q"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 8,
+            "Symbol": "8"
+          }
+        }
+      ],
+      "DealWinner": "Yogis"
+    },
+    {
+      "DealNumber": 8,
+      "Initiator": "Yogis",
+      "SuitType": "Spade",
+      "DealCards": [
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 8,
+            "Symbol": "8"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 14,
+            "Symbol": "A"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 9,
+            "Symbol": "9"
+          }
+        }
+      ],
+      "DealWinner": "Dummy-0"
+    },
+    {
+      "DealNumber": 9,
+      "Initiator": "Dummy-0",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-0",
+          "Card": {
+            "Suit": "Club",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        },
+        {
+          "TeamName": "Pankaj",
+          "Card": {
+            "Suit": "Club",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        },
+        {
+          "TeamName": "Yogis",
+          "Card": {
+            "Suit": "Club",
+            "Number": 13,
+            "Symbol": "K"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        }
+      ],
+      "DealWinner": "Yogis"
+    }
+  ],
+  "MyInProgressDeal": {
+    "DealNumber": 10,
+    "Initiator": "Yogis",
+    "SuitType": "Heart",
+    "DealCards": [
+      {
+        "TeamName": "Yogis",
+        "Card": {
+          "Suit": "Heart",
+          "Number": 9,
+          "Symbol": "9"
+        }
+      }
+    ],
+    "DealWinner": null
+  },
+  "IsMyTurn": true
+}

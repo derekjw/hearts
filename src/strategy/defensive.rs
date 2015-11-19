@@ -74,7 +74,7 @@ impl DefensiveCardStrategy {
             .filter(|&(_, shoot_score)| shoot_score > 0)
             .collect::<Vec<_>>();
 
-        let shoot_target = 26 - deals.len() as i32;
+        let shoot_target = 24 - deals.len() as i32;
 
         if possible_shooters.len() == 1 {
             possible_shooters.into_iter()

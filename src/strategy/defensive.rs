@@ -217,7 +217,8 @@ impl DefensiveCardStrategy {
                 .is_some();
 
             let other_win_points = if voider || ((number_of_suit as f32) < safe_target && number_dealt < 3) {
-                Self::chance_of_later_win(card, remaining_cards) * other_points
+                let other_cards = remaining_cards.iter().chain(dealt_cards).cloned().collect::<BTreeSet<_>>();
+                Self::chance_of_later_win(card, &other_cards) * other_points
             } else {
                 0.0
             };
@@ -263,7 +264,12 @@ impl DefensiveCardStrategy {
             1.0
         } else {
             if Self::deal_suit(in_progress_deal).map(|suit| suit == &card.suit).unwrap_or(true) && Self::plays_left(game_players, in_progress_deal).len() > 0 {
-                let suit_cards = remaining_cards.iter().filter(|other| other.suit == card.suit).collect::<Vec<_>>();
+                let suit_cards = remaining_cards.iter()
+                    .chain(in_progress_deal.iter()
+                        .flat_map(|deal| deal.deal_cards.iter())
+                        .map(|deal_card| &deal_card.card))
+                    .filter(|other| other.suit == card.suit)
+                    .collect::<Vec<_>>();
                 let will_win_count = suit_cards.iter().filter(|other| other.rank < card.rank).collect::<Vec<_>>().len();
                 if suit_cards.is_empty() {
                     1.0
@@ -436,6 +442,7 @@ mod tests {
         should_try_to_win_deal_1 => Queen.of(Club)
         should_prevent_shooter_1 => King.of(Heart)
         should_play_low_club_1 => Four.of(Club)
+        should_play_low_club_2 => Three.of(Club)
 
         // corrections to this game cause no difference to outcome
         normal_game_1_01_01 => Four.of(Club)

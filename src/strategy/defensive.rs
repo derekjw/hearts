@@ -28,7 +28,7 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn score_card(card: &Card, game_status: &GameStatus) -> CardScore {
+    fn score_card(&self, card: &Card, game_status: &GameStatus) -> CardScore {
         let remaining_cards = game_status.unplayed_cards();
 
         let void_suits = Self::void_suits(game_status);
@@ -45,7 +45,7 @@ impl DefensiveCardStrategy {
             safe_remaining_cards_iter.filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
         };
 
-        let potential_points = Self::potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards, &void_suits, &game_status.round_parameters);
+        let potential_points = self.potential_points(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards, &void_suits, &game_status.round_parameters);
 
         let definite_points = if Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &safe_remaining_cards) {
             potential_points
@@ -63,16 +63,12 @@ impl DefensiveCardStrategy {
 
         let card_rank =  0 - (u32::from(card.rank) as i32) * rank_modifier;
 
-        let card_score = CardScore {
+        CardScore {
             definite_points: (definite_points * 1000.0) as i32,
             potential_points: (potential_points * 1000.0) as i32,
             later_potential_points: (later_potential_points * 1000.0) as i32,
             rank: card_rank,
-        };
-
-        Self::possible_shooter(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters)
-            .map(|_| card_score.invert())
-            .unwrap_or(card_score)
+        }
     }
 
     fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
@@ -196,7 +192,7 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
-    fn potential_points(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> f32 {
+    fn potential_points(&self, card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> f32 {
         if Self::can_win_deal(card, in_progress_deal) {
             let dealt_cards = Self::dealt_cards(in_progress_deal);
 
@@ -243,7 +239,7 @@ impl DefensiveCardStrategy {
                 .next()
                 .is_some();
 
-            let other_win_points = if voider || ((number_of_suit as f32) < safe_target && number_dealt < 3) {
+            let other_win_points = if self.shooting_the_moon || voider || ((number_of_suit as f32) < safe_target && number_dealt < 3) {
                 let other_cards = remaining_cards.iter().chain(dealt_cards).cloned().collect::<BTreeSet<_>>();
                 Self::chance_of_later_win(card, &other_cards) * other_points
             } else {
@@ -365,15 +361,24 @@ impl CardStrategy for DefensiveCardStrategy {
             }
 
             let initial_evaluation = valid_cards.into_iter()
-                .map(|card| (Self::score_card(card, game_status), card))
+                .map(|card| (self.score_card(card, game_status), card))
                 .collect::<BTreeSet<_>>();
+
+            let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters).is_some();
 
             let i_am_shooter = self.am_i_shooter(game_status);
             self.shooting_the_moon = i_am_shooter;
 
-            let evaluation = if i_am_shooter {
+            if i_am_shooter {
                 info!("Shooting the moon!");
-                initial_evaluation.into_iter().map(|(card_score, card)| (card_score.invert(), card)).collect()
+            } else if possible_shooter {
+                info!("Possible shooter detected!");
+            }
+
+            let evaluation = if i_am_shooter || possible_shooter {
+                initial_evaluation.into_iter()
+                    .map(|(card_score, card)| (card_score.invert(), card))
+                    .collect()
             } else {
                 initial_evaluation
             };

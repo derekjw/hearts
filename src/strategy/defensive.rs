@@ -10,18 +10,21 @@ use game_status::GameParticipant;
 use game_status::PlayerName;
 
 use std::fmt;
+use std::iter;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 #[derive(Debug)]
 pub struct DefensiveCardStrategy {
     player_name: PlayerName,
+    shooting_the_moon: bool,
 }
 
 impl DefensiveCardStrategy {
     pub fn new(player_name: PlayerName) -> DefensiveCardStrategy {
         DefensiveCardStrategy {
             player_name: player_name,
+            shooting_the_moon: false,
         }
     }
 
@@ -73,14 +76,7 @@ impl DefensiveCardStrategy {
     }
 
     fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
-        let possible_shooters = game_players.iter()
-            .map(|player|
-                (player, Self::cards_won(deals, &player.team_name).iter()
-                    .filter(|card| Self::shooting_card(card))
-                    .map(|card| round_parameters.points(card))
-                    .sum::<i32>()))
-            .filter(|&(_, shoot_score)| shoot_score > 0)
-            .collect::<Vec<_>>();
+        let possible_shooters = Self::possible_shooters(game_players, deals, round_parameters);
 
         let shoot_target = 20 - deals.len() as i32;
 
@@ -92,6 +88,28 @@ impl DefensiveCardStrategy {
         } else {
             None
         }
+    }
+
+    fn possible_shooters<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Vec<(&'a GameParticipant, i32)> {
+        game_players.iter()
+            .map(|player|
+                (player, Self::cards_won(deals, &player.team_name).iter()
+                    .filter(|card| Self::shooting_card(card))
+                    .map(|card| round_parameters.points(card))
+                    .sum::<i32>()))
+            .filter(|&(_, shoot_score)| shoot_score > 0)
+            .collect()
+    }
+
+    fn am_i_shooter(&self, game_status: &GameStatus) -> bool {
+        let possible_shooters = Self::possible_shooters(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters);
+        let remaining_cards = game_status.unplayed_cards();
+        let hand = &game_status.my_current_hand;
+
+        possible_shooters.len() <= 1 &&
+            possible_shooters.into_iter().map(|(shooter, _)| shooter.team_name == self.player_name).next().unwrap_or(true) &&
+            (self.shooting_the_moon ||
+                (hand.iter().filter(|card| Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards)).collect::<Vec<_>>().len() * 4 > hand.len()))
     }
 
     fn cards_won<'a>(deals: &'a Vec<Deal>, player: &PlayerName) -> BTreeSet<&'a Card> {
@@ -189,6 +207,7 @@ impl DefensiveCardStrategy {
                 .sum::<i32>() as f32;
 
             let suit_points = remaining_cards.iter()
+                .chain(iter::once(card))
                 .filter(|other| other.suit == card.suit)
                 .filter(|other| other.rank < card.rank)
                 .map(|other| round_parameters.points(other))
@@ -231,7 +250,7 @@ impl DefensiveCardStrategy {
                 0.0
             };
 
-            card_points + dealt_points + suit_win_points + other_win_points
+            dealt_points + suit_win_points + other_win_points
         } else {
             0.0
         }
@@ -290,13 +309,19 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn pass_card<'a>(hand: &'a BTreeSet<Card>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters) -> Option<&'a Card> {
+    fn pass_card<'a>(hand: &'a BTreeSet<Card>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters, shooting: bool) -> Option<&'a Card> {
         hand.iter()
             .filter(|card| !remaining_cards.contains(card))
-            .map(|card| ((0 - (Self::later_potential_points(card, &remaining_cards, round_parameters) * 1000.0) as i32, card), card))
-            .collect::<BTreeMap<_, &Card>>()
-            .values()
-            .cloned()
+            .map(|card| {
+                let mut points = 0 - (Self::later_potential_points(card, &remaining_cards, round_parameters) * 1000.0) as i32;
+                if shooting {
+                    points = points.abs()
+                }
+                (points, card)
+            })
+            .collect::<BTreeSet<_>>()
+            .into_iter()
+            .map(|(_, card)| card)
             .next()
     }
 
@@ -313,11 +338,14 @@ impl CardStrategy for DefensiveCardStrategy {
         info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
         let mut remaining_cards = game_status.unplayed_cards();
 
-        let card1 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+        let i_am_shooter = self.am_i_shooter(game_status);
+        self.shooting_the_moon = i_am_shooter;
+
+        let card1 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters, i_am_shooter);
         if let Some(card) = card1 { remaining_cards.insert(card.clone()); };
-        let card2 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+        let card2 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters, i_am_shooter);
         if let Some(card) = card2 { remaining_cards.insert(card.clone()); };
-        let card3 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters);
+        let card3 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters, i_am_shooter);
 
         vec!(card1, card2, card3).into_iter().filter_map(|card| card).collect()
     }
@@ -336,9 +364,19 @@ impl CardStrategy for DefensiveCardStrategy {
                 valid_cards.extend(&game_status.my_current_hand);
             }
 
-            let evaluation = valid_cards.into_iter()
-                .map(|card| ((Self::score_card(card, game_status), card), card))
-                .collect::<BTreeMap<_,&Card>>();
+            let initial_evaluation = valid_cards.into_iter()
+                .map(|card| (Self::score_card(card, game_status), card))
+                .collect::<BTreeSet<_>>();
+
+            let i_am_shooter = self.am_i_shooter(game_status);
+            self.shooting_the_moon = i_am_shooter;
+
+            let evaluation = if i_am_shooter {
+                info!("Shooting the moon!");
+                initial_evaluation.into_iter().map(|(card_score, card)| (card_score.invert(), card)).collect()
+            } else {
+                initial_evaluation
+            };
 
             info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
             info!("Void: {}", Self::void_suits(game_status).iter()
@@ -349,11 +387,12 @@ impl CardStrategy for DefensiveCardStrategy {
                 .collect::<Vec<_>>().join(", "));
             info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
             for item in &evaluation {
-                let (&(ref score, _), ref card) = item;
+                let &(ref score, ref card) = item;
                 info!("{}: {}", card, score);
             }
 
-            evaluation.values()
+            evaluation.iter()
+                .map(|&(_, card)| card)
                 .next()
                 .expect("No valid cards to play!")
         }
@@ -372,10 +411,10 @@ struct CardScore {
 impl CardScore {
     pub fn invert(&self) -> CardScore {
         CardScore {
-            definite_points: 0 - self.definite_points,
-            potential_points: 0 - self.potential_points,
-            later_potential_points: 0 - self.later_potential_points,
-            rank: 0 - self.rank,
+            definite_points: 0 - self.definite_points.abs(),
+            potential_points: 0 - self.potential_points.abs(),
+            later_potential_points: self.later_potential_points.abs(),
+            rank: self.rank,
         }
     }
 }
@@ -442,7 +481,7 @@ mod tests {
 
         should_play_heart_1 => Seven.of(Heart)
         should_play_heart_2 => Four.of(Heart)
-        should_not_play_high_heart_1 => Three.of(Spade)
+        should_not_play_high_heart_1 => Seven.of(Heart)
         should_play_high_rank_1 => King.of(Diamond)
         should_play_high_rank_2 => Ace.of(Spade)
         should_play_high_rank_3 => Ace.of(Spade)
@@ -452,7 +491,7 @@ mod tests {
         should_play_high_negative_points_card_2 => King.of(Diamond)
         should_try_to_win_deal_1 => Queen.of(Club)
         should_prevent_shooter_1 => King.of(Heart)
-        should_play_low_club_1 => Four.of(Club)
+        // should_play_low_club_1 => Four.of(Club) // To the moon!!
         should_play_low_club_2 => Three.of(Club)
 
         // corrections to this game cause no difference to outcome

@@ -4,12 +4,12 @@ use game_status::GameInstanceState;
 use game_status::RoundState;
 use game_status::HeartsGameInstanceState;
 use game_status::GameParticipant;
+use game_status::PlayerName;
 
 use card::Card;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::dto::DealDto;
-use player::PlayerName;
 use try_from::TryFrom;
 use try_from::TryInto;
 use error::Error;

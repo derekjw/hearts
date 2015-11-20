@@ -1,5 +1,6 @@
 #![feature(dir_builder)]
 #![feature(iter_arith)]
+#![feature(box_syntax)]
 #![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
 
@@ -17,16 +18,16 @@ extern crate clap;
 mod macros;
 
 mod card;
-mod player;
+mod hearts_client;
 mod game_status;
 mod deal;
 mod strategy;
 mod try_from;
 mod error;
 
-use player::Player;
-use player::PlayerName;
-use player::Password;
+use hearts_client::HeartsClient;
+use hearts_client::Password;
+use game_status::PlayerName;
 use strategy::DefensiveCardStrategy;
 
 use clap::App;
@@ -53,6 +54,8 @@ fn main() {
 
     info!("Start Game");
 
-    let player = Player::new(player_name, password, server, DefensiveCardStrategy, repeat);
-    player.play();
+    let strategy = DefensiveCardStrategy::new(player_name);
+
+    let client = HeartsClient::new(password, server, strategy, repeat);
+    client.play();
 }

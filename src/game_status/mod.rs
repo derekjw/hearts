@@ -2,10 +2,10 @@ pub mod dto;
 
 use card::Card;
 use deal::Deal;
-use player::PlayerName;
 
 use std::collections::BTreeSet;
 use std::collections::BTreeMap;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct GameStatus {
@@ -50,6 +50,34 @@ impl GameStatus {
         cards
     }
 
+}
+
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone)]
+pub struct PlayerName(String);
+
+impl PlayerName {
+    pub fn new<A>(value: A) -> PlayerName
+    where A: Into<String> {
+        PlayerName(value.into())
+    }
+}
+
+impl fmt::Display for PlayerName {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", &self.0)
+    }
+}
+
+impl From<PlayerName> for String {
+    fn from(player: PlayerName) -> String {
+        player.0
+    }
+}
+
+impl <'a> From<&'a PlayerName> for &'a str {
+    fn from(player: &'a PlayerName) -> &'a str {
+        &player.0
+    }
 }
 
 string_enum! {

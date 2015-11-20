@@ -18,7 +18,6 @@ use std::io::Write;
 use std::collections::BTreeSet;
 use std::time::Duration;
 use std::thread;
-use std::fmt;
 
 use hyper;
 use hyper::Client;
@@ -26,34 +25,6 @@ use hyper::client::Response;
 use hyper::header;
 
 use serde_json;
-
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone)]
-pub struct PlayerName(String);
-
-impl PlayerName {
-    pub fn new<A>(value: A) -> PlayerName
-    where A: Into<String> {
-        PlayerName(value.into())
-    }
-}
-
-impl fmt::Display for PlayerName {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}", &self.0)
-    }
-}
-
-impl From<PlayerName> for String {
-    fn from(player: PlayerName) -> String {
-        player.0
-    }
-}
-
-impl <'a> From<&'a PlayerName> for &'a str {
-    fn from(player: &'a PlayerName) -> &'a str {
-        &player.0
-    }
-}
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Password(String);
@@ -80,8 +51,7 @@ struct GameResponse {
     data: String,
 }
 
-pub struct Player<A: CardStrategy> {
-    player_name: PlayerName,
+pub struct HeartsClient<A: CardStrategy> {
     password: Password,
     base_url: String,
     card_strategy: A,
@@ -92,11 +62,10 @@ pub struct Player<A: CardStrategy> {
     current_game_id: Option<String>,
 }
 
-impl<A: CardStrategy> Player<A> {
-    pub fn new(player_name: PlayerName, password: Password, hostname: &str, card_strategy: A, repeat: bool) -> Player<A> {
+impl<A: CardStrategy> HeartsClient<A> {
+    pub fn new(password: Password, hostname: &str, card_strategy: A, repeat: bool) -> HeartsClient<A> {
         let base_url = format!("http://{}/api/participant", hostname);
-        Player {
-            player_name: player_name,
+        HeartsClient {
             password: password,
             base_url: base_url,
             card_strategy: card_strategy,
@@ -254,7 +223,7 @@ impl<A: CardStrategy> Player<A> {
     }
 
     fn do_dealing_activity(&mut self, game_status: &GameStatus) -> Result<()> {
-        let card_to_deal = self.card_strategy.play_card(game_status, &self.player_name);
+        let card_to_deal = self.card_strategy.play_card(game_status);
         let card_to_deal_dto: CardDto = card_to_deal.into();
 
         let serialized_card_to_deal = try!(serde_json::to_string(&card_to_deal_dto));
@@ -325,7 +294,7 @@ impl<A: CardStrategy> Player<A> {
     fn authorization(&self) -> header::Authorization<header::Basic> {
         header::Authorization(
             header::Basic {
-                username: self.player_name.clone().into(),
+                username: self.card_strategy.player_name().clone().into(),
                 password: Some(self.password.clone().into())
             }
         )

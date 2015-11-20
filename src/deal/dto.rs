@@ -1,4 +1,4 @@
-use player::PlayerName;
+use game_status::PlayerName;
 use card::Card;
 use card::Suit;
 use card::dto::CardDto;

@@ -7,16 +7,24 @@ use deal::Deal;
 use game_status::GameStatus;
 use game_status::RoundParameters;
 use game_status::GameParticipant;
-use player::PlayerName;
+use game_status::PlayerName;
 
 use std::fmt;
 use std::collections::BTreeMap;
 use std::collections::BTreeSet;
 
 #[derive(Debug)]
-pub struct DefensiveCardStrategy;
+pub struct DefensiveCardStrategy {
+    player_name: PlayerName,
+}
 
 impl DefensiveCardStrategy {
+    pub fn new(player_name: PlayerName) -> DefensiveCardStrategy {
+        DefensiveCardStrategy {
+            player_name: player_name,
+        }
+    }
+
     fn score_card(card: &Card, game_status: &GameStatus) -> CardScore {
         let remaining_cards = game_status.unplayed_cards();
 
@@ -297,6 +305,10 @@ impl DefensiveCardStrategy {
 
 impl CardStrategy for DefensiveCardStrategy {
 
+    fn player_name(&self) -> &PlayerName {
+        &self.player_name
+    }
+
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
         info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
         let mut remaining_cards = game_status.unplayed_cards();
@@ -310,8 +322,7 @@ impl CardStrategy for DefensiveCardStrategy {
         vec!(card1, card2, card3).into_iter().filter_map(|card| card).collect()
     }
 
-    #[allow(unused_variables)]
-    fn play_card<'a>(&mut self, game_status: &'a GameStatus, player_name: &PlayerName) -> &'a Card {
+    fn play_card<'a>(&mut self, game_status: &'a GameStatus) -> &'a Card {
         let two_of_clubs = Rank::Two.of(Suit::Club);
         if let Some(card) = game_status.my_current_hand.iter().find(|&card| card == &two_of_clubs) {
             card
@@ -382,7 +393,7 @@ impl fmt::Display for CardScore {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use player::PlayerName;
+    use game_status::PlayerName;
     use card::Card;
     use card::Rank::*;
     use card::Suit::*;
@@ -411,7 +422,7 @@ mod tests {
     fn should_play(name: &str, expected_card: Card) {
         let player_name = PlayerName::new("Derek Williams");
         let game_status = open_scenario(name);
-        let card = DefensiveCardStrategy.play_card(&game_status, &player_name).clone();
+        let card = DefensiveCardStrategy::new(player_name).play_card(&game_status).clone();
         assert_eq!(expected_card, card);
     }
 

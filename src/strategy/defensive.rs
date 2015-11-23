@@ -116,7 +116,7 @@ impl DefensiveCardStrategy {
             .collect()
     }
 
-    fn am_i_shooter(&self, game_status: &GameStatus) -> bool {
+    fn am_i_shooter(&self, game_status: &GameStatus, multiplier: f32) -> bool {
         let possible_shooters = Self::possible_shooters(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters);
         let remaining_cards = game_status.unplayed_cards();
         let hand = &game_status.my_current_hand;
@@ -124,7 +124,9 @@ impl DefensiveCardStrategy {
         possible_shooters.len() <= 1 &&
             possible_shooters.into_iter().map(|(shooter, _)| shooter.team_name == self.player_name).next().unwrap_or(true) &&
             (self.shooting_the_moon ||
-                (hand.iter().filter(|card| Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards)).collect::<Vec<_>>().len() * 2 > hand.len()))
+                (hand.iter()
+                    .filter(|card| Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards))
+                    .collect::<Vec<_>>().len() as f32 * multiplier > hand.len() as f32))
     }
 
     fn cards_won<'a>(deals: &'a Vec<Deal>, player: &PlayerName) -> BTreeSet<&'a Card> {
@@ -353,7 +355,7 @@ impl CardStrategy for DefensiveCardStrategy {
         info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(" "));
         let mut remaining_cards = game_status.unplayed_cards();
 
-        let i_am_shooter = self.am_i_shooter(game_status);
+        let i_am_shooter = self.am_i_shooter(game_status, 3.0);
         self.shooting_the_moon = i_am_shooter;
 
         let card1 = Self::pass_card(&game_status.my_initial_hand, &remaining_cards, &game_status.round_parameters, i_am_shooter);
@@ -385,7 +387,7 @@ impl CardStrategy for DefensiveCardStrategy {
 
             let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.in_progress_deal, &game_status.game_deals, &game_status.round_parameters).is_some();
 
-            let i_am_shooter = self.am_i_shooter(game_status);
+            let i_am_shooter = self.am_i_shooter(game_status, 2.5);
             self.shooting_the_moon = i_am_shooter;
 
             if i_am_shooter {

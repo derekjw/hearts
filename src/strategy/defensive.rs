@@ -71,7 +71,7 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
+    fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, in_progress_deal: &Option<Deal>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
         let possible_shooters = Self::possible_shooters(game_players, deals, round_parameters);
 
         let shoot_target = 20 - deals.len() as i32;
@@ -80,10 +80,29 @@ impl DefensiveCardStrategy {
             possible_shooters.into_iter()
                 .filter(|&(_, shoot_score)| shoot_score > shoot_target)
                 .map(|(player, _)| player)
+                .filter(|shooter|
+                    in_progress_deal.as_ref()
+                        .map(|deal| Self::player_might_win_deal(&shooter.team_name, deal))
+                        .unwrap_or(true))
                 .next()
         } else {
             None
         }
+    }
+
+    fn player_might_win_deal(player: &PlayerName, in_progress_deal: &Deal) -> bool {
+        in_progress_deal.suit.and_then(|suit|
+            in_progress_deal.deal_cards.iter()
+                .filter(|deal_card| deal_card.player_name == *player)
+                .map(|deal_card| deal_card.card)
+                .map(|shooter_card|
+                    shooter_card.suit == suit &&
+                        in_progress_deal.deal_cards.iter()
+                            .filter(|deal_card| deal_card.card.suit == suit)
+                            .filter(|deal_card| deal_card.card.rank > shooter_card.rank)
+                            .next().is_none())
+                .next())
+        .unwrap_or(true)
     }
 
     fn possible_shooters<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Vec<(&'a GameParticipant, i32)> {
@@ -331,7 +350,7 @@ impl CardStrategy for DefensiveCardStrategy {
     }
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
-        info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
+        info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(" "));
         let mut remaining_cards = game_status.unplayed_cards();
 
         let i_am_shooter = self.am_i_shooter(game_status);
@@ -364,7 +383,7 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| (self.score_card(card, game_status), card))
                 .collect::<BTreeSet<_>>();
 
-            let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.game_deals, &game_status.round_parameters).is_some();
+            let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.in_progress_deal, &game_status.game_deals, &game_status.round_parameters).is_some();
 
             let i_am_shooter = self.am_i_shooter(game_status);
             self.shooting_the_moon = i_am_shooter;
@@ -383,14 +402,14 @@ impl CardStrategy for DefensiveCardStrategy {
                 initial_evaluation
             };
 
-            info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(", "));
+            info!("Unplayed: {}", game_status.unplayed_cards().iter().map(|card| format!("{}", card)).collect::<Vec<_>>().join(" "));
             info!("Void: {}", Self::void_suits(game_status).iter()
                 .map(|(player_name, ref player_void_suits)|
                     format!("{}[{}]", player_name, player_void_suits.iter()
                         .map(|suit| format!("{}", suit))
                         .collect::<Vec<_>>().join("")))
-                .collect::<Vec<_>>().join(", "));
-            info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(", "));
+                .collect::<Vec<_>>().join(" "));
+            info!("My Hand:  {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(" "));
             for item in &evaluation {
                 let &(ref score, ref card) = item;
                 info!("{}: {}", card, score);
@@ -498,6 +517,7 @@ mod tests {
         should_prevent_shooter_1 => King.of(Heart)
         // should_play_low_club_1 => Four.of(Club) // To the moon!!
         should_play_low_club_2 => Three.of(Club)
+        should_play_low_heart_1 => Two.of(Heart)
 
         // corrections to this game cause no difference to outcome
         normal_game_1_01_01 => Four.of(Club)

@@ -352,6 +352,8 @@ impl CardStrategy for DefensiveCardStrategy {
     }
 
     fn pass_cards<'a>(&mut self, game_status: &'a GameStatus) -> Vec<&'a Card> {
+        self.shooting_the_moon = false;
+
         info!("My Hand : {}", game_status.my_current_hand.iter().map(|card| format!("{}", card)).collect::<Vec<String>>().join(" "));
         let mut remaining_cards = game_status.unplayed_cards();
 

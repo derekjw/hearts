@@ -105,7 +105,7 @@ impl DefensiveCardStrategy {
         possible_shooters.len() <= 1 &&
             possible_shooters.into_iter().map(|(shooter, _)| shooter.team_name == self.player_name).next().unwrap_or(true) &&
             (self.shooting_the_moon ||
-                (hand.iter().filter(|card| Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards)).collect::<Vec<_>>().len() * 3 > hand.len()))
+                (hand.iter().filter(|card| Self::will_win_deal(card, &game_status.game_players, &game_status.in_progress_deal, &remaining_cards)).collect::<Vec<_>>().len() * 2 > hand.len()))
     }
 
     fn cards_won<'a>(deals: &'a Vec<Deal>, player: &PlayerName) -> BTreeSet<&'a Card> {

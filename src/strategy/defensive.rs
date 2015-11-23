@@ -241,7 +241,7 @@ impl DefensiveCardStrategy {
 
             let safe_target = 9.0 + card_points + dealt_points - (number_dealt as f32);
 
-            let suit_win_modifier = if suit_points < 0.0 && dealt_points > 2.0 {
+            let suit_win_modifier = if suit_points < 0.0 && dealt_points > 2.0 && number_dealt < 3 {
                 0.0 - 0.5
             } else {
                 1.0

@@ -387,18 +387,18 @@ impl CardStrategy for DefensiveCardStrategy {
                 .map(|card| (self.score_card(card, game_status), card))
                 .collect::<BTreeSet<_>>();
 
-            let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.in_progress_deal, &game_status.game_deals, &game_status.round_parameters).is_some();
+            let possible_shooter = Self::possible_shooter(&game_status.game_players, &game_status.in_progress_deal, &game_status.game_deals, &game_status.round_parameters);
 
-            let i_am_shooter = self.am_i_shooter(game_status, 2.5);
+            let i_am_shooter = self.am_i_shooter(game_status, 2.0);
             self.shooting_the_moon = i_am_shooter;
 
             if i_am_shooter {
                 info!("Shooting the moon!");
-            } else if possible_shooter {
-                info!("Possible shooter detected!");
+            } else if let Some(shooter) = possible_shooter {
+                info!("Possible shooter detected: {}", shooter.team_name);
             }
 
-            let evaluation = if i_am_shooter || possible_shooter {
+            let evaluation = if i_am_shooter || possible_shooter.is_some() {
                 initial_evaluation.into_iter()
                     .map(|(card_score, card)| (card_score.invert(), card))
                     .collect()

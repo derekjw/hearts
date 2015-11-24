@@ -1,0 +1,667 @@
+{
+  "CurrentGameId": "5d27f897df644a91afa2e2029494a403",
+  "CurrentGameState": "Running",
+  "CurrentRoundId": 1,
+  "CurrentRoundState": "Running",
+  "RoundParameters": {
+    "RoundId": 1,
+    "InitiationPhaseInSeconds": 5,
+    "PassingPhaseInSeconds": 15,
+    "DealingPhaseInSeconds": 5,
+    "FinishingPhaseInSeconds": 5,
+    "NumberOfCardsTobePassed": 3,
+    "CardPoints": [
+      {
+        "Card": {
+          "Suit": "Spade",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 13
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 2,
+          "Symbol": "2"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 3,
+          "Symbol": "3"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 4,
+          "Symbol": "4"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 5,
+          "Symbol": "5"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 6,
+          "Symbol": "6"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 7,
+          "Symbol": "7"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 8,
+          "Symbol": "8"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 9,
+          "Symbol": "9"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 10,
+          "Symbol": "10"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 11,
+          "Symbol": "J"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 12,
+          "Symbol": "Q"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 13,
+          "Symbol": "K"
+        },
+        "Point": 1
+      },
+      {
+        "Card": {
+          "Suit": "Heart",
+          "Number": 14,
+          "Symbol": "A"
+        },
+        "Point": 1
+      }
+    ]
+  },
+  "MyGameState": "Dealing",
+  "MyGameStateDescription": "Playing",
+  "MyGameParticipants": [
+    {
+      "TeamName": "Derek Williams",
+      "LeftParticipant": "Sergey.Shpilev",
+      "NumberOfCardsInHand": 6,
+      "HasTurn": true,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "Sergey.Shpilev",
+      "LeftParticipant": "MEI_AKELA_NHI",
+      "NumberOfCardsInHand": 6,
+      "HasTurn": false,
+      "CurrentScore": 0
+    },
+    {
+      "TeamName": "MEI_AKELA_NHI",
+      "LeftParticipant": "Dummy-11",
+      "NumberOfCardsInHand": 5,
+      "HasTurn": false,
+      "CurrentScore": 9
+    },
+    {
+      "TeamName": "Dummy-11",
+      "LeftParticipant": "Derek Williams",
+      "NumberOfCardsInHand": 5,
+      "HasTurn": false,
+      "CurrentScore": 0
+    }
+  ],
+  "MyInitialHand": [
+    {
+      "Suit": "Spade",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 2,
+      "Symbol": "2"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Club",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    }
+  ],
+  "CardsPassedByMe": [
+    {
+      "Suit": "Heart",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 14,
+      "Symbol": "A"
+    },
+    {
+      "Suit": "Club",
+      "Number": 13,
+      "Symbol": "K"
+    }
+  ],
+  "CardsPassedToMe": [
+    {
+      "Suit": "Spade",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Club",
+      "Number": 10,
+      "Symbol": "10"
+    }
+  ],
+  "MyFinalHand": [
+    {
+      "Suit": "Spade",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 11,
+      "Symbol": "J"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 2,
+      "Symbol": "2"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Club",
+      "Number": 3,
+      "Symbol": "3"
+    },
+    {
+      "Suit": "Club",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Club",
+      "Number": 11,
+      "Symbol": "J"
+    }
+  ],
+  "MyCurrentHand": [
+    {
+      "Suit": "Spade",
+      "Number": 10,
+      "Symbol": "10"
+    },
+    {
+      "Suit": "Spade",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 7,
+      "Symbol": "7"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 12,
+      "Symbol": "Q"
+    },
+    {
+      "Suit": "Heart",
+      "Number": 13,
+      "Symbol": "K"
+    },
+    {
+      "Suit": "Diamond",
+      "Number": 2,
+      "Symbol": "2"
+    }
+  ],
+  "MyGameDeals": [
+    {
+      "DealNumber": 1,
+      "Initiator": "Dummy-11",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Club",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        },
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Club",
+            "Number": 12,
+            "Symbol": "Q"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Club",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        }
+      ],
+      "DealWinner": "Sergey.Shpilev"
+    },
+    {
+      "DealNumber": 2,
+      "Initiator": "Sergey.Shpilev",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Club",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Club",
+            "Number": 8,
+            "Symbol": "8"
+          }
+        },
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Club",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        }
+      ],
+      "DealWinner": "Derek Williams"
+    },
+    {
+      "DealNumber": 3,
+      "Initiator": "Derek Williams",
+      "SuitType": "Diamond",
+      "DealCards": [
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 12,
+            "Symbol": "Q"
+          }
+        },
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        }
+      ],
+      "DealWinner": "Derek Williams"
+    },
+    {
+      "DealNumber": 4,
+      "Initiator": "Derek Williams",
+      "SuitType": "Spade",
+      "DealCards": [
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 11,
+            "Symbol": "J"
+          }
+        },
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 5,
+            "Symbol": "5"
+          }
+        },
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 2,
+            "Symbol": "2"
+          }
+        }
+      ],
+      "DealWinner": "Derek Williams"
+    },
+    {
+      "DealNumber": 5,
+      "Initiator": "Derek Williams",
+      "SuitType": "Spade",
+      "DealCards": [
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        },
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 13,
+            "Symbol": "K"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 7,
+            "Symbol": "7"
+          }
+        },
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Spade",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        }
+      ],
+      "DealWinner": "Sergey.Shpilev"
+    },
+    {
+      "DealNumber": 6,
+      "Initiator": "Sergey.Shpilev",
+      "SuitType": "Diamond",
+      "DealCards": [
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 4,
+            "Symbol": "4"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 10,
+            "Symbol": "10"
+          }
+        },
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 14,
+            "Symbol": "A"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Diamond",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        }
+      ],
+      "DealWinner": "Dummy-11"
+    },
+    {
+      "DealNumber": 7,
+      "Initiator": "Dummy-11",
+      "SuitType": "Club",
+      "DealCards": [
+        {
+          "TeamName": "Dummy-11",
+          "Card": {
+            "Suit": "Club",
+            "Number": 9,
+            "Symbol": "9"
+          }
+        },
+        {
+          "TeamName": "Derek Williams",
+          "Card": {
+            "Suit": "Club",
+            "Number": 3,
+            "Symbol": "3"
+          }
+        },
+        {
+          "TeamName": "Sergey.Shpilev",
+          "Card": {
+            "Suit": "Heart",
+            "Number": 6,
+            "Symbol": "6"
+          }
+        },
+        {
+          "TeamName": "MEI_AKELA_NHI",
+          "Card": {
+            "Suit": "Club",
+            "Number": 14,
+            "Symbol": "A"
+          }
+        }
+      ],
+      "DealWinner": "MEI_AKELA_NHI"
+    }
+  ],
+  "MyInProgressDeal": {
+    "DealNumber": 8,
+    "Initiator": "MEI_AKELA_NHI",
+    "SuitType": "Spade",
+    "DealCards": [
+      {
+        "TeamName": "MEI_AKELA_NHI",
+        "Card": {
+          "Suit": "Spade",
+          "Number": 9,
+          "Symbol": "9"
+        }
+      },
+      {
+        "TeamName": "Dummy-11",
+        "Card": {
+          "Suit": "Spade",
+          "Number": 8,
+          "Symbol": "8"
+        }
+      }
+    ],
+    "DealWinner": null
+  },
+  "IsMyTurn": true
+}

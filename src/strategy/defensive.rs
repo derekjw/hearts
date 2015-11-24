@@ -226,7 +226,7 @@ impl DefensiveCardStrategy {
             let suit_points = remaining_cards.iter()
                 .chain(iter::once(card))
                 .filter(|other| other.suit == card.suit)
-                .filter(|other| other.rank < card.rank)
+                .filter(|other| other.rank <= card.rank)
                 .map(|other| round_parameters.points(other))
                 .sum::<i32>() as f32;
 
@@ -327,7 +327,7 @@ impl DefensiveCardStrategy {
     }
 
     fn pass_card<'a>(hand: &'a BTreeSet<Card>, remaining_cards: &BTreeSet<Card>, round_parameters: &RoundParameters, shooting: bool) -> Option<&'a Card> {
-        let mut card_iter = hand.iter()
+        hand.iter()
             .filter(|card| !remaining_cards.contains(card))
             .map(|card| {
                 let mut points = 0 - (Self::later_potential_points(card, &remaining_cards, round_parameters) * 1000.0) as i32;
@@ -348,13 +348,8 @@ impl DefensiveCardStrategy {
             })
             .collect::<BTreeSet<_>>()
             .into_iter()
-            .map(|(_, card)| card);
-        if !shooting {
-            let mut suits_seen = vec![Suit::Diamond, Suit::Club].into_iter().collect::<BTreeSet<_>>();
-            card_iter.filter(|card| !suits_seen.remove(&card.suit)).next()
-        } else {
-            card_iter.next()
-        }
+            .map(|(_, card)| card)
+            .next()
     }
 
 
@@ -537,6 +532,7 @@ mod tests {
         // should_play_low_club_1 => Four.of(Club) // To the moon!!
         should_play_low_club_2 => Three.of(Club)
         should_play_low_heart_1 => Two.of(Heart)
+        should_not_play_queen_of_spades => Ten.of(Spade)
 
         // corrections to this game cause no difference to outcome
         normal_game_1_01_01 => Four.of(Club)

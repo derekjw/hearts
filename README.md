@@ -1,1 +1,3 @@
 # hearts
+
+Requires unstable Rust.

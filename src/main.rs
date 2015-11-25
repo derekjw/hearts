@@ -6,6 +6,8 @@
 
 #![plugin(serde_macros)]
 
+#![allow(unused_attributes)]
+
 extern crate hyper;
 #[macro_use]
 extern crate log;

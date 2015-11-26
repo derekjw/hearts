@@ -15,6 +15,7 @@ extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
 extern crate clap;
+extern crate try_from;
 
 #[macro_use]
 mod macros;
@@ -24,7 +25,6 @@ mod hearts_client;
 mod game_status;
 mod deal;
 mod strategy;
-mod try_from;
 mod error;
 
 use hearts_client::HeartsClient;

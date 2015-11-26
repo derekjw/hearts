@@ -9,6 +9,7 @@ dependencies = [
  "serde 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_macros 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "try_from 0.1.0 (git+https://github.com/derekjw/try_from.git)",
 ]
 
 [[package]]
@@ -360,6 +361,11 @@ dependencies = [
 name = "traitobject"
 version = "0.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "try_from"
+version = "0.1.0"
+source = "git+https://github.com/derekjw/try_from.git#d1df19a86ea91c74556bca29614d243fa97bdad2"
 
 [[package]]
 name = "typeable"

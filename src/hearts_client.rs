@@ -276,9 +276,8 @@ impl<A: CardStrategy> HeartsClient<A> {
             .and_then(GameStatus::try_from)
     }
 
-    fn parse_game_response(response: Response) -> Result<String> {
+    fn parse_game_response(mut response: Response) -> Result<String> {
         assert_eq!(hyper::Ok, response.status);
-        let mut response = response;
         let mut response_body = String::new();
         try!(response.read_to_string(&mut response_body));
         let game_response: GameResponse = try!(serde_json::from_str(&response_body));

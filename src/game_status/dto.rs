@@ -58,7 +58,7 @@ impl TryFrom<GameStatusDto> for GameStatus {
 
     fn try_from(dto: GameStatusDto) -> Result<GameStatus> {
         let my_in_progress_deal = match dto.my_in_progress_deal.map(Deal::try_from) {
-            Some(result) => result.map(|value| Some(value)),
+            Some(result) => result.map(Some),
             None => Ok(None)
         };
         Ok(GameStatus {

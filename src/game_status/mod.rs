@@ -37,7 +37,7 @@ impl GameStatus {
             }
         }
 
-        if let &Some(ref deal) = &self.in_progress_deal {
+        if let Some(ref deal) = self.in_progress_deal {
             for deal_card in &deal.deal_cards {
                 cards.remove(&deal_card.card);
             }
@@ -115,7 +115,7 @@ pub struct RoundParameters {
 impl RoundParameters {
     pub fn points(&self, card: &Card) -> i32 {
         self.card_points.get(card)
-            .map(|penalty| *penalty)
+            .cloned()
             .unwrap_or_default()
     }
 }

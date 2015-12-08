@@ -100,7 +100,7 @@ impl<A: CardStrategy> HeartsClient<A> {
     }
 
     fn set_current_game_id(&mut self, game_id: &str) {
-        if self.current_game_id.as_ref().map(|current_game_id| current_game_id != game_id).unwrap_or(true) {
+        if self.current_game_id.as_ref().map_or(true, |current_game_id| current_game_id != game_id) {
             self.player_activity_tracker.clear();
             self.current_game_id = Some(game_id.to_owned())
         }
@@ -119,11 +119,9 @@ impl<A: CardStrategy> HeartsClient<A> {
 
     fn on_game_open(&mut self) -> Result<()> {
         let key_join_status = "JoinGame".to_owned();
-        if !self.player_activity_tracker.contains(&key_join_status) {
-            if self.join_game() {
-                info!("Join successful");
-                self.player_activity_tracker.insert(key_join_status);
-            }
+        if !self.player_activity_tracker.contains(&key_join_status) && self.join_game() {
+            info!("Join successful");
+            self.player_activity_tracker.insert(key_join_status);
         };
         Ok(())
     }
@@ -183,7 +181,7 @@ impl<A: CardStrategy> HeartsClient<A> {
     }
 
     fn log_game_status(&self, game_status: &GameStatus, deal_number: u32) -> Result<()> {
-        let ref game_id = game_status.current_game_id;
+        let game_id = &game_status.current_game_id;
         let round_id = game_status.current_round_id;
         let dir_name = format!("game_log/{}", game_id);
         try!(fs::DirBuilder::new().recursive(true).create(&dir_name));

@@ -39,7 +39,7 @@ impl DefensiveCardStrategy {
 
         let safe_remaining_cards_iter = game_status.unplayed_cards().into_iter().filter(|other| !deal_void_suits.contains(&other.suit));
 
-        let safe_remaining_cards = if game_status.in_progress_deal.as_ref().map(|deal| deal.deal_cards.is_empty()).unwrap_or(true) {
+        let safe_remaining_cards = if game_status.in_progress_deal.as_ref().map_or(true, |deal| deal.deal_cards.is_empty()) {
             safe_remaining_cards_iter.collect::<BTreeSet<_>>()
         } else {
             safe_remaining_cards_iter.filter(|other| !game_status.cards_passed_by_me.contains(other)).collect()
@@ -71,7 +71,7 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn possible_shooter<'a>(game_players: &'a Vec<GameParticipant>, in_progress_deal: &Option<Deal>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
+    fn possible_shooter<'a>(game_players: &'a [GameParticipant], in_progress_deal: &Option<Deal>, deals: &[Deal], round_parameters: &RoundParameters) -> Option<&'a GameParticipant> {
         let possible_shooters = Self::possible_shooters(game_players, deals, round_parameters);
 
         let shoot_target = 20 - deals.len() as i32;
@@ -82,8 +82,7 @@ impl DefensiveCardStrategy {
                 .map(|(player, _)| player)
                 .filter(|shooter|
                     in_progress_deal.as_ref()
-                        .map(|deal| Self::player_might_win_deal(&shooter.team_name, deal))
-                        .unwrap_or(true))
+                        .map_or(true, |deal| Self::player_might_win_deal(&shooter.team_name, deal)))
                 .next()
         } else {
             None
@@ -105,7 +104,7 @@ impl DefensiveCardStrategy {
         .unwrap_or(true)
     }
 
-    fn possible_shooters<'a>(game_players: &'a Vec<GameParticipant>, deals: &Vec<Deal>, round_parameters: &RoundParameters) -> Vec<(&'a GameParticipant, i32)> {
+    fn possible_shooters<'a>(game_players: &'a [GameParticipant], deals: &[Deal], round_parameters: &RoundParameters) -> Vec<(&'a GameParticipant, i32)> {
         game_players.iter()
             .map(|player|
                 (player, Self::cards_won(deals, &player.team_name).iter()
@@ -129,9 +128,9 @@ impl DefensiveCardStrategy {
                     .collect::<Vec<_>>().len() as f32 * multiplier > hand.len() as f32))
     }
 
-    fn cards_won<'a>(deals: &'a Vec<Deal>, player: &PlayerName) -> BTreeSet<&'a Card> {
+    fn cards_won<'a>(deals: &'a [Deal], player: &PlayerName) -> BTreeSet<&'a Card> {
         deals.iter()
-            .filter(|deal| deal.deal_winner.as_ref().map(|winner| winner == player).unwrap_or(false))
+            .filter(|deal| deal.deal_winner.as_ref().map_or(false, |winner| winner == player))
             .flat_map(|deal| deal.deal_cards.iter())
             .map(|deal_card| &deal_card.card)
             .collect()
@@ -178,13 +177,13 @@ impl DefensiveCardStrategy {
         }).unwrap_or(true)
     }
 
-    fn will_win_deal(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> bool {
-        Self::can_win_deal(card, in_progress_deal) && (Self::plays_left(game_players, in_progress_deal).len() == 0 || {
+    fn will_win_deal(card: &Card, game_players: &[GameParticipant], in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> bool {
+        Self::can_win_deal(card, in_progress_deal) && (Self::plays_left(game_players, in_progress_deal).is_empty() || {
             let suit = Self::deal_suit(in_progress_deal).unwrap_or(&card.suit);
             remaining_cards.iter()
                 .filter(|other| &other.suit == suit)
                 .max()
-                .map(|winning_card| card.rank > winning_card.rank).unwrap_or(true)
+                .map_or(true, |winning_card| card.rank > winning_card.rank)
         })
     }
 
@@ -192,13 +191,13 @@ impl DefensiveCardStrategy {
         in_progress_deal.as_ref().and_then(|deal| deal.suit.as_ref())
     }
 
-    fn plays_left<'a>(game_players: &'a Vec<GameParticipant>, in_progress_deal: &Option<Deal>) -> BTreeSet<&'a PlayerName> {
+    fn plays_left<'a>(game_players: &'a [GameParticipant], in_progress_deal: &Option<Deal>) -> BTreeSet<&'a PlayerName> {
         let mut players: BTreeSet<&PlayerName> = game_players.iter()
             .filter(|player| !player.has_turn)
             .map(|player| &player.team_name)
             .collect();
 
-        if let &Some(ref deal) = in_progress_deal {
+        if let Some(ref deal) = *in_progress_deal {
             for deal_card in &deal.deal_cards {
                 players.remove(&deal_card.player_name);
             }
@@ -213,7 +212,7 @@ impl DefensiveCardStrategy {
             .unwrap_or_default()
     }
 
-    fn potential_points(&self, card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> f32 {
+    fn potential_points(&self, card: &Card, game_players: &[GameParticipant], in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>, void_suits: &BTreeMap<&PlayerName, BTreeSet<Suit>>, round_parameters: &RoundParameters) -> f32 {
         if Self::can_win_deal(card, in_progress_deal) {
             let dealt_cards = Self::dealt_cards(in_progress_deal);
 
@@ -303,11 +302,11 @@ impl DefensiveCardStrategy {
         }
     }
 
-    fn chance_of_win(card: &Card, game_players: &Vec<GameParticipant>, in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> f32 {
+    fn chance_of_win(card: &Card, game_players: &[GameParticipant], in_progress_deal: &Option<Deal>, remaining_cards: &BTreeSet<Card>) -> f32 {
         if Self::will_win_deal(card, game_players, in_progress_deal, remaining_cards) {
             1.0
         } else {
-            if Self::deal_suit(in_progress_deal).map(|suit| suit == &card.suit).unwrap_or(true) && Self::plays_left(game_players, in_progress_deal).len() > 0 {
+            if Self::deal_suit(in_progress_deal).map_or(true, |suit| suit == &card.suit) && !Self::plays_left(game_players, in_progress_deal).is_empty() {
                 let suit_cards = remaining_cards.iter()
                     .chain(in_progress_deal.iter()
                         .flat_map(|deal| deal.deal_cards.iter())

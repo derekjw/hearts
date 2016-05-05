@@ -1,8 +1,6 @@
 use card::Card;
 use card::Suit;
 
-use error::Result;
-
 use std::fmt;
 
 string_enum! {

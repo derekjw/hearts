@@ -4,11 +4,11 @@ version = "0.0.1"
 authors = [ "Derek Williams <derek.williams1@rbs.com>" ]
 
 [dependencies]
-hyper = "0.6.15"
-serde = "0.6.1"
-serde_json = "0.6.0"
-serde_macros = "0.6.1"
+hyper = "0.9"
+serde = "0.7"
+serde_json = "0.7"
+serde_macros = "0.7"
 log = "0.3"
 env_logger = "0.3"
-clap = "1.4.6"
+clap = "2.4"
 try_from = "0.1"

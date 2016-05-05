@@ -1,4 +1,3 @@
-#![feature(dir_builder)]
 #![feature(iter_arith)]
 #![feature(box_syntax)]
 #![feature(custom_attribute)]

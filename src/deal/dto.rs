@@ -14,13 +14,13 @@ use std::str::FromStr;
 pub struct DealDto {
     #[serde(rename="DealNumber")]
     deal_number: u32,
-    #[serde(rename="Initiator", Default)]
+    #[serde(rename="Initiator", default)]
     initiator: Option<PlayerName>,
     #[serde(rename="SuitType")]
     suit_type: String,
-    #[serde(rename="DealCards", Default)]
+    #[serde(rename="DealCards", default)]
     deal_cards: Vec<DealCardDto>,
-    #[serde(rename="DealWinner", Default)]
+    #[serde(rename="DealWinner", default)]
     deal_winner: Option<PlayerName>,
 }
 

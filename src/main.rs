@@ -1,5 +1,3 @@
-#![feature(iter_arith)]
-#![feature(box_syntax)]
 #![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
 

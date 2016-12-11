@@ -1,7 +1,6 @@
 #![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
-
-#![plugin(serde_macros)]
+#![feature(proc_macro)]
 
 #![allow(unused_attributes)]
 
@@ -11,6 +10,8 @@ extern crate log;
 extern crate env_logger;
 extern crate serde;
 extern crate serde_json;
+#[macro_use]
+extern crate serde_derive;
 extern crate clap;
 extern crate try_from;
 

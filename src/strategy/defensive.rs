@@ -477,7 +477,7 @@ mod tests {
     use game_status::dto::GameStatusDto;
     use strategy::CardStrategy;
 
-    use try_from::TryFrom;
+    use std::convert::TryFrom;
     use error::Error;
 
     extern crate serde;

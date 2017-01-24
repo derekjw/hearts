@@ -4,10 +4,10 @@ use card::Suit;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::DealCard;
-use try_from::TryFrom;
 use error::Error;
 use error::Result;
 
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 #[derive(Serialize, Deserialize, Debug)]

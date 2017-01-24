@@ -146,7 +146,7 @@ mod tests {
     use super::*;
     use super::dto::*;
 
-    use try_from::TryFrom;
+    use std::convert::TryFrom;
     use error::Error;
 
     extern crate env_logger;

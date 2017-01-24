@@ -10,11 +10,11 @@ use card::Card;
 use card::dto::CardDto;
 use deal::Deal;
 use deal::dto::DealDto;
-use try_from::TryFrom;
-use try_from::TryInto;
 use error::Error;
 use error::Result;
 
+use std::convert::TryFrom;
+use std::convert::TryInto;
 use std::str::FromStr;
 
 #[derive(Serialize, Deserialize, Debug)]

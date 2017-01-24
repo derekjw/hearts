@@ -3,7 +3,8 @@ use card::Suit;
 use card::Rank;
 use error::Error;
 use error::Result;
-use try_from::TryFrom;
+
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
@@ -42,7 +43,7 @@ mod tests {
     use card::Card;
     use card::Rank;
     use card::Suit;
-    use try_from::TryFrom;
+    use std::convert::TryFrom;
 
     #[test]
     fn into_card() {

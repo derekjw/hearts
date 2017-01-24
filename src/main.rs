@@ -1,5 +1,6 @@
 #![feature(custom_derive, plugin)]
 #![feature(proc_macro)]
+#![feature(try_from)]
 
 #![allow(unused_attributes)]
 
@@ -12,7 +13,6 @@ extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
 extern crate clap;
-extern crate try_from;
 
 #[macro_use]
 mod macros;

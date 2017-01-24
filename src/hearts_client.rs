@@ -7,10 +7,10 @@ use game_status::{
 };
 use game_status::dto::GameStatusDto;
 use card::dto::CardDto;
-use try_from::TryFrom;
 use error::Error;
 use error::Result;
 
+use std::convert::TryFrom;
 use std::fs;
 use std::fs::File;
 use std::io::Read;

@@ -1,4 +1,3 @@
-#![feature(custom_attribute)]
 #![feature(custom_derive, plugin)]
 #![feature(proc_macro)]
 

@@ -19,8 +19,8 @@ pub struct CardDto {
 impl TryFrom<CardDto> for Card {
     type Err = Error;
     fn try_from(dto: CardDto) -> Result<Card> {
-        let suit = try!(Suit::from_str(&dto.suit));
-        let rank = try!(Rank::from_str(&dto.symbol));
+        let suit = Suit::from_str(&dto.suit)?;
+        let rank = Rank::from_str(&dto.symbol)?;
         Ok(Card::new(suit, rank))
     }
 }

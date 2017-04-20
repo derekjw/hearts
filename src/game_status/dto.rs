@@ -54,7 +54,7 @@ pub struct GameStatusDto {
 }
 
 impl TryFrom<GameStatusDto> for GameStatus {
-    type Err = Error;
+    type Error = Error;
 
     fn try_from(dto: GameStatusDto) -> Result<GameStatus> {
         let my_in_progress_deal = match dto.my_in_progress_deal.map(Deal::try_from) {
@@ -124,7 +124,7 @@ pub struct RoundParametersDto {
 }
 
 impl TryFrom<RoundParametersDto> for RoundParameters {
-    type Err = Error;
+    type Error = Error;
     fn try_from(dto: RoundParametersDto) -> Result<RoundParameters> {
         Ok(RoundParameters {
             round_id: dto.round_id,
@@ -161,7 +161,7 @@ pub struct CardPointsDto {
 }
 
 impl TryFrom<CardPointsDto> for (Card, i32) {
-    type Err = Error;
+    type Error = Error;
 
     fn try_from(dto: CardPointsDto) -> Result<(Card, i32)> {
         Ok((Card::try_from(dto.card)?, dto.points))

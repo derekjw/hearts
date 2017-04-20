@@ -25,7 +25,7 @@ pub struct DealDto {
 }
 
 impl TryFrom<DealDto> for Deal {
-    type Err = Error;
+    type Error = Error;
     fn try_from(dto: DealDto) -> Result<Deal> {
         let deal_cards = dto.deal_cards.into_iter().map(DealCard::try_from).collect::<Result<Vec<DealCard>>>()?;
         let suit = Suit::from_str(&dto.suit_type)?;
@@ -60,7 +60,7 @@ pub struct DealCardDto {
 }
 
 impl TryFrom<DealCardDto> for DealCard {
-    type Err = Error;
+    type Error = Error;
     fn try_from(dto: DealCardDto) -> Result<DealCard> {
         Ok(DealCard {
             player_name: dto.team_name.clone(),

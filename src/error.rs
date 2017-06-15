@@ -51,7 +51,7 @@ impl Error {
     pub fn game<A: Into<String>>(cause: Option<A>) -> Error {
         match cause {
             Some(string) => Error::Game(string.into()),
-            None => Error::Game("Unknown server error".to_owned())
+            None => Error::Game("Unknown server error".to_owned()),
         }
     }
 }
@@ -73,4 +73,3 @@ impl From<SerdeJsonError> for Error {
         Error::Json(err)
     }
 }
-

@@ -11,12 +11,15 @@ use std::collections::BTreeSet;
 #[derive(Debug, PartialEq, PartialOrd, Eq, Ord, Clone, Copy)]
 pub struct Card {
     pub suit: Suit,
-    pub rank: Rank
+    pub rank: Rank,
 }
 
 impl Card {
     pub fn new(suit: Suit, rank: Rank) -> Card {
-        Card { suit: suit, rank: rank }
+        Card {
+            suit: suit,
+            rank: rank,
+        }
     }
 
     pub fn all() -> BTreeSet<Card> {
@@ -28,7 +31,6 @@ impl Card {
         }
         cards
     }
-
 }
 
 impl fmt::Display for Card {
@@ -61,7 +63,10 @@ mod tests {
 
     #[test]
     fn invalid_rank() {
-        assert_eq!("Error while parsing \"1\" as Rank", Rank::from_str("1").unwrap_err().description());
+        assert_eq!(
+            "Error while parsing \"1\" as Rank",
+            Rank::from_str("1").unwrap_err().description()
+        );
     }
 
 }

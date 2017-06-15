@@ -52,7 +52,7 @@ impl From<Rank> for u32 {
             Rank::Jack => 11,
             Rank::Queen => 12,
             Rank::King => 13,
-            Rank::Ace => 14
+            Rank::Ace => 14,
         }
     }
 }

@@ -9,11 +9,11 @@ use std::str::FromStr;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq)]
 pub struct CardDto {
-    #[serde(rename="Suit")]
+    #[serde(rename = "Suit")]
     suit: String,
-    #[serde(rename="Number")]
+    #[serde(rename = "Number")]
     number: u32,
-    #[serde(rename="Symbol")]
+    #[serde(rename = "Symbol")]
     symbol: String,
 }
 
@@ -26,12 +26,12 @@ impl TryFrom<CardDto> for Card {
     }
 }
 
-impl <'a> From<&'a Card> for CardDto {
+impl<'a> From<&'a Card> for CardDto {
     fn from(card: &'a Card) -> CardDto {
         CardDto {
             suit: card.suit.into(),
             number: card.rank.into(),
-            symbol: card.rank.into()
+            symbol: card.rank.into(),
         }
     }
 }
@@ -47,7 +47,11 @@ mod tests {
 
     #[test]
     fn into_card() {
-        let dto = CardDto { suit: "Heart".to_owned(), number: 3, symbol: "3".to_owned() };
+        let dto = CardDto {
+            suit: "Heart".to_owned(),
+            number: 3,
+            symbol: "3".to_owned(),
+        };
         let card = Card::try_from(dto);
         assert_eq!(Card::new(Suit::Heart, Rank::Three), card.unwrap());
     }
@@ -56,7 +60,14 @@ mod tests {
     fn from_card() {
         let card = Card::new(Suit::Heart, Rank::Three);
         let dto = CardDto::from(&card);
-        assert_eq!(CardDto { suit: "Heart".to_owned(), number: 3, symbol: "3".to_owned() }, dto);
+        assert_eq!(
+            CardDto {
+                suit: "Heart".to_owned(),
+                number: 3,
+                symbol: "3".to_owned(),
+            },
+            dto
+        );
     }
 
 }

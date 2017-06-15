@@ -49,7 +49,6 @@ impl GameStatus {
 
         cards
     }
-
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Eq, Ord, Clone)]
@@ -57,7 +56,9 @@ pub struct PlayerName(String);
 
 impl PlayerName {
     pub fn new<A>(value: A) -> PlayerName
-    where A: Into<String> {
+    where
+        A: Into<String>,
+    {
         PlayerName(value.into())
     }
 }
@@ -74,7 +75,7 @@ impl From<PlayerName> for String {
     }
 }
 
-impl <'a> From<&'a PlayerName> for &'a str {
+impl<'a> From<&'a PlayerName> for &'a str {
     fn from(player: &'a PlayerName) -> &'a str {
         &player.0
     }
@@ -109,14 +110,12 @@ pub struct RoundParameters {
     pub dealing_phase_in_seconds: u32,
     pub finishing_phase_in_seconds: u32,
     pub number_of_cards_to_be_passed: u32,
-    pub card_points: BTreeMap<Card, i32>
+    pub card_points: BTreeMap<Card, i32>,
 }
 
 impl RoundParameters {
     pub fn points(&self, card: &Card) -> i32 {
-        self.card_points.get(card)
-            .cloned()
-            .unwrap_or_default()
+        self.card_points.get(card).cloned().unwrap_or_default()
     }
 }
 
@@ -160,8 +159,12 @@ mod tests {
     fn read_json() {
         let mut game_status_file = File::open("samples/gamestatus.json").unwrap();
         let mut game_status_string = String::new();
-        game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        game_status_file
+            .read_to_string(&mut game_status_string)
+            .unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string)
+            .map_err(Error::from)
+            .unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
@@ -169,8 +172,12 @@ mod tests {
     fn read_json2() {
         let mut game_status_file = File::open("samples/gamestatus2.json").unwrap();
         let mut game_status_string = String::new();
-        game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        game_status_file
+            .read_to_string(&mut game_status_string)
+            .unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string)
+            .map_err(Error::from)
+            .unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
@@ -178,8 +185,12 @@ mod tests {
     fn read_json3() {
         let mut game_status_file = File::open("samples/gamestatus3.json").unwrap();
         let mut game_status_string = String::new();
-        game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        game_status_file
+            .read_to_string(&mut game_status_string)
+            .unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string)
+            .map_err(Error::from)
+            .unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
@@ -187,8 +198,12 @@ mod tests {
     fn read_json4() {
         let mut game_status_file = File::open("samples/gamestatus4.json").unwrap();
         let mut game_status_string = String::new();
-        game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        game_status_file
+            .read_to_string(&mut game_status_string)
+            .unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string)
+            .map_err(Error::from)
+            .unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
@@ -196,8 +211,12 @@ mod tests {
     fn read_json5() {
         let mut game_status_file = File::open("samples/gamestatus5.json").unwrap();
         let mut game_status_string = String::new();
-        game_status_file.read_to_string(&mut game_status_string).unwrap();
-        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string).map_err(Error::from).unwrap();
+        game_status_file
+            .read_to_string(&mut game_status_string)
+            .unwrap();
+        let game_status_dto: GameStatusDto = serde_json::from_str(&game_status_string)
+            .map_err(Error::from)
+            .unwrap();
         GameStatus::try_from(game_status_dto).unwrap();
     }
 
